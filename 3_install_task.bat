@@ -57,7 +57,37 @@ rem ---------------------------------------------------------------
 echo ------------------------------------------------------------
 echo   Registering...
 echo ------------------------------------------------------------
-schtasks /Create /TN "%TASKNAME%" /TR "wscript.exe \"%VBS%\"" /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST 16:30 /RL LIMITED /F
+
+rem ===========================================================
+rem  BUILDING THE /TR ARGUMENT
+rem -----------------------------------------------------------
+rem  cmd.exe does NOT use backslash as an escape character.
+rem  The previous version wrote:
+rem      /TR "wscript.exe \"%VBS%\""
+rem  cmd closes the quote at the second " so the tool received a
+rem  mangled argument and the task was never created.
+rem
+rem  This project path has no spaces, so no inner quotes are
+rem  needed. That single-quote form is the reliable one here.
+rem
+rem  If the project is ever moved to a path WITH spaces this will
+rem  probably fail again - use the GUI method printed at the end.
+rem ===========================================================
+set "TR_ARG=wscript.exe %VBS%"
+
+echo "%VBS%" | find " " >nul
+if not errorlevel 1 (
+    echo   [WARN] Project path contains spaces.
+    echo          Automatic /TR quoting is unreliable in that case.
+    echo          If creation fails below, use the GUI method.
+    echo.
+)
+
+echo   Exact command being run:
+echo     schtasks /Create /TN "%TASKNAME%" /TR "%TR_ARG%" /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST 16:30 /RL LIMITED /F
+echo.
+
+schtasks /Create /TN "%TASKNAME%" /TR "%TR_ARG%" /SC WEEKLY /D MON,TUE,WED,THU,FRI /ST 16:30 /RL LIMITED /F
 if errorlevel 1 goto :create_failed
 echo.
 
@@ -135,6 +165,9 @@ echo                                   Run as administrator
 echo     "Invalid argument"        -^> a path contains a special character;
 echo                                   move the project to a simpler folder
 echo     "The task already exists" -^> should not happen thanks to /F
+echo.
+echo   First check whether it was created after all:
+echo       schtasks /Query /TN "%TASKNAME%"
 echo.
 echo   Or create it by hand:
 echo     taskschd.msc -^> Create Basic Task
