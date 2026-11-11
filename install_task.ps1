@@ -1,3 +1,10 @@
+param(
+    # -Auto : non-interactive mode, used by ONE_CLICK_INSTALL.bat.
+    #   Skips every 'Press Enter' prompt and fires the task once at the end
+    #   so the user immediately sees whether it actually works.
+    [switch]$Auto
+)
+
 # ===========================================================================
 #  install_task.ps1 ---- register the weekday 16:30 scheduled task
 # ---------------------------------------------------------------------------
@@ -41,7 +48,7 @@ $isAdmin = ([Security.Principal.WindowsPrincipal] `
 if (-not $isAdmin) {
     Write-Host '[STOP] Not elevated.' -ForegroundColor Red
     Write-Host '       Close this window, open "Terminal (Admin)", and run again.'
-    Read-Host 'Press Enter to exit'
+    if (-not $Auto) { Read-Host 'Press Enter to exit' }
     exit 1
 }
 Write-Host '[OK] Elevated.' -ForegroundColor Green
@@ -50,7 +57,7 @@ Write-Host '[OK] Elevated.' -ForegroundColor Green
 foreach ($f in @($VbsPath, $WscriptExe)) {
     if (-not (Test-Path -LiteralPath $f)) {
         Write-Host "[FAIL] Not found: $f" -ForegroundColor Red
-        Read-Host 'Press Enter to exit'
+        if (-not $Auto) { Read-Host 'Press Enter to exit' }
         exit 1
     }
     Write-Host "[OK] $f" -ForegroundColor Green
@@ -70,10 +77,17 @@ $Trigger = New-ScheduledTaskTrigger `
     -DaysOfWeek Monday, Tuesday, Wednesday, Thursday, Friday `
     -At '16:30'
 
+# Parameter names verified against this machine's ScheduledTasks module:
+#   New-ScheduledTaskSettingsSet has NO -DisallowStartIfOnBatteries.
+#   The switches are inverted:
+#       -AllowStartIfOnBatteries   => DisallowStartIfOnBatteries = false
+#       -DontStopIfGoingOnBatteries => StopIfGoingOnBatteries   = false
+#   Using the wrong name throws "parameter cannot be found" and the
+#   whole registration dies before anything is created.
 $Settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
-    -DisallowStartIfOnBatteries:$false `
-    -StopIfGoingOnBatteries:$false `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
     -ExecutionTimeLimit (New-TimeSpan -Hours 1) `
     -MultipleInstances IgnoreNew
 
@@ -85,7 +99,7 @@ $Principal = New-ScheduledTaskPrincipal `
 Write-Host 'Action  :' $WscriptExe $Action.Arguments
 Write-Host 'StartIn :' $ProjectDir
 Write-Host 'Trigger : Mon-Fri 16:30'
-Write-Host 'Settings: StartWhenAvailable = ON, AllowOnBatteries = ON'
+Write-Host 'Settings: StartWhenAvailable = ON, battery = allowed, no stop on battery'
 Write-Host ''
 
 # ---- 4. register --------------------------------------------------------
@@ -103,7 +117,7 @@ try {
 catch {
     Write-Host '[FAIL] Registration failed:' -ForegroundColor Red
     Write-Host $_.Exception.Message
-    Read-Host 'Press Enter to exit'
+    if (-not $Auto) { Read-Host 'Press Enter to exit' }
     exit 1
 }
 
@@ -113,7 +127,7 @@ Write-Host '--- Verification -------------------------------------------'
 $t = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
 if ($null -eq $t) {
     Write-Host '[FAIL] Task not found after registration.' -ForegroundColor Red
-    Read-Host 'Press Enter to exit'
+    if (-not $Auto) { Read-Host 'Press Enter to exit' }
     exit 1
 }
 
@@ -136,4 +150,21 @@ Write-Host ''
 Write-Host '  Remove it later with:'
 Write-Host "    Unregister-ScheduledTask -TaskName $TaskName -Confirm:`$false"
 Write-Host ''
-Read-Host 'Press Enter to exit'
+if ($Auto) {
+    Write-Host '--- Firing the task once to verify -------------------------'
+    try {
+        Start-ScheduledTask -TaskName $TaskName
+        Write-Host '[OK] Task started in the background.' -ForegroundColor Green
+        Write-Host '     Watch reports\ and logs\review.log for the result.'
+        Write-Host '     A browser tab opens when the review finishes.'
+    }
+    catch {
+        Write-Host '[WARN] Could not start it right now:' -ForegroundColor Yellow
+        Write-Host $_.Exception.Message
+        Write-Host '       The task IS registered; run it from Task Scheduler later.'
+    }
+    Start-Sleep -Seconds 3
+}
+else {
+    Read-Host 'Press Enter to exit'
+}
