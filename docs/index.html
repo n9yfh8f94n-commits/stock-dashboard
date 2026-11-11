@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>A股复盘仪表盘 20261111</title>
+<title>A股复盘仪表盘 20261110</title>
 <style>
   :root{
     --bg:#0b0e14; --panel:#131a24; --panel2:#1a2230; --border:#243040;
@@ -105,23 +105,23 @@
 <header>
   <div>
     <div class="brand">A股超短线 · <span class="accent">情绪仪表盘</span></div>
-    <div class="date" style="margin-top:5px">交易日 <b>2026-11-11</b>
-      　·　生成 2026-11-11 13:08</div>
+    <div class="date" style="margin-top:5px">交易日 <b>2026-11-10</b>
+      　·　生成 2026-11-11 13:22</div>
   </div>
   <div class="spacer"></div>
   <div class="badges">
-    <span class="badge" style="border-color:#4c9aff;color:#4c9aff">情绪 <b>🟡 回暖</b></span>
-    <span class="badge warn">数据源 <b>3/6</b></span><span class="badge">情绪周期窗口 <b>30</b> 日</span>
+    <span class="badge" style="border-color:#f6465d;color:#f6465d">情绪 <b>🔴 高潮</b></span>
+    <span class="badge warn">数据源 <b>5/6</b></span><span class="badge">情绪周期窗口 <b>29</b> 日（请求 30）</span>
     <span class="badge">口径 <b>缓存+联网席位</b></span>
   </div>
-</header>
+</header><div class="warnbox"><div>👀 最高板已达 7 板，注意空间压制与断板风险</div></div>
 <div class="kpis">
-  <div class="kpi" style="--accent:#4c9aff"><div class="k">情绪档位</div><div class="v "><span style="color:#4c9aff">回暖</span></div><div class="s">炸板率 26.1% ≤ 30% 且赚钱效应 +2.65% > 0</div></div>
-  <div class="kpi" style="--accent:#f6465d"><div class="k">真实涨停 / 有效</div><div class="v ">51<small>/ 51</small></div><div class="s">剔除次新 0 家 · 跌停 0 家</div></div>
-  <div class="kpi" style="--accent:#0ecb81"><div class="k">炸板率</div><div class="v down">26.1<small>%</small></div><div class="s">封板率 <em>73.9%</em> · 炸板 18 家</div></div>
-  <div class="kpi" style="--accent:#f6465d"><div class="k">打板赚钱效应</div><div class="v up">+2.65<small>%</small></div><div class="s">上涨占比 <em>66.7%</em> · 晋级率 <em>17.2%</em></div></div>
-  <div class="kpi" style="--accent:#f0b90b"><div class="k">最高连板</div><div class="v gold">4<small>板</small></div><div class="s">大东方、日出东方</div></div>
-  <div class="kpi" style="--accent:#4c9aff"><div class="k">明日仓位建议</div><div class="v "><span style="font-size:15px">50%~70%</span></div><div class="s">可加仓主线龙头，止损位收紧到 -5%</div></div>
+  <div class="kpi" style="--accent:#f6465d"><div class="k">情绪档位</div><div class="v "><span style="color:#f6465d">高潮</span></div><div class="s">涨停 88 家 ≥ 80、炸板率 17.8% ≤ 20%、最高 7 板 ≥ 5</div></div>
+  <div class="kpi" style="--accent:#f6465d"><div class="k">真实涨停 / 有效</div><div class="v ">88<small>/ 88</small></div><div class="s">剔除次新 0 家 · 跌停 0 家</div></div>
+  <div class="kpi" style="--accent:#0ecb81"><div class="k">炸板率</div><div class="v down">17.8<small>%</small></div><div class="s">封板率 <em>82.2%</em> · 炸板 19 家</div></div>
+  <div class="kpi" style="--accent:#f6465d"><div class="k">打板赚钱效应</div><div class="v up">+5.00<small>%</small></div><div class="s">上涨占比 <em>89.1%</em> · 晋级率 <em>36.4%</em></div></div>
+  <div class="kpi" style="--accent:#f0b90b"><div class="k">最高连板</div><div class="v gold">7<small>板</small></div><div class="s">闽发铝业</div></div>
+  <div class="kpi" style="--accent:#4c9aff"><div class="k">明日仓位建议</div><div class="v "><span style="font-size:15px">60%~80% 但只减不加</span></div><div class="s">持有为主，次日冲高兑现，禁止追新</div></div>
 </div>
 <div class="card"><div id="c_emotion" class="chart h400"></div></div>
 
@@ -133,21 +133,26 @@
 <table>
   <thead><tr><th>板块</th><th style="text-align:right">涨停</th>
     <th style="text-align:right">占比</th><th style="text-align:right">最高</th><th>龙头</th></tr></thead>
-  <tbody><tr><td style='color:#8b98a8;font-weight:600'>通用设备</td><td style='text-align:right'>6</td><td style='text-align:right'>11.8%</td><td style='text-align:right'>3 板</td><td class='mono'>锋龙股份(002931)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>汽车零部件</td><td style='text-align:right'>6</td><td style='text-align:right'>11.8%</td><td style='text-align:right'>3 板</td><td class='mono'>光洋股份(002708)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>专用设备</td><td style='text-align:right'>4</td><td style='text-align:right'>7.8%</td><td style='text-align:right'>2 板</td><td class='mono'>达 意 隆(002209</td></tr><tr><td style='color:#8b98a8;font-weight:600'>光伏设备</td><td style='text-align:right'>3</td><td style='text-align:right'>5.9%</td><td style='text-align:right'>3 板</td><td class='mono'>亚玛顿(002623)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>游戏Ⅱ</td><td style='text-align:right'>3</td><td style='text-align:right'>5.9%</td><td style='text-align:right'>3 板</td><td class='mono'>文投控股(600715)</td></tr></tbody>
+  <tbody><tr><td style='color:#8b98a8;font-weight:600'>汽车零部件</td><td style='text-align:right'>11</td><td style='text-align:right'>12.5%</td><td style='text-align:right'>2 板</td><td class='mono'>光洋股份(002708)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>通用设备</td><td style='text-align:right'>6</td><td style='text-align:right'>6.8%</td><td style='text-align:right'>2 板</td><td class='mono'>锋龙股份(002931)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>光学光电</td><td style='text-align:right'>5</td><td style='text-align:right'>5.7%</td><td style='text-align:right'>1 板</td><td class='mono'>华体科技(603679)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>专用设备</td><td style='text-align:right'>4</td><td style='text-align:right'>4.5%</td><td style='text-align:right'>1 板</td><td class='mono'>天奇股份(002009)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>消费电子</td><td style='text-align:right'>4</td><td style='text-align:right'>4.5%</td><td style='text-align:right'>1 板</td><td class='mono'>国光电器(002045)</td></tr></tbody>
 </table>
 <div class="note">集中度 <b style="color:#0ecb81">低集中</b> —— 题材散乱轮动，无明确主线，只做首板且快进快出</div>
   </div>
 </div>
 
 <div class="card"><div id="c_sankey" class="chart h460"></div>
-  <div class="note">口径：仅第一层（活跃营业部合计口径），单票金额不可得。桑基仅画净买入方向，净卖出见下方矩阵。</div>
+  <div class="note">口径：双层：活跃营业部 + 20 只龙虎榜个股席位。桑基仅画净买入方向，净卖出见下方矩阵。</div>
 </div>
 
 <div class="card"><div id="c_heat" class="chart h430"></div></div>
 
 <div class="card">
   <h3 class="sec">游资席位明细</h3>
-  <div class="note">今日未命中知名游资席位，或龙虎榜数据缺失。</div>
+  
+<table>
+  <thead><tr><th>游资</th><th>营业部</th><th style="text-align:right">净额(万)</th>
+    <th>操作股票</th><th>来源</th></tr></thead>
+  <tbody><tr><td><b>北向资金</b></td><td class='mono' title='深股通专用'>深股通专用</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +42,837</td><td>东方日升(300118)、东方海洋(0020</td><td><span class='tag '>活跃营业部</span></td></tr><tr><td><b>章盟主</b></td><td class='mono' title='国泰海通证券股份有限公司长宁区江苏路证券营业部'>国泰海通证券股份有限公司长宁区江苏路证券…</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +12,897</td><td>浙文影业(601599)</td><td><span class='tag seat'>席位-买入</span></td></tr><tr><td><b>北向资金</b></td><td class='mono' title='沪股通专用'>沪股通专用</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +12,294</td><td>文投控股(600715)、龙迅股份(6884</td><td><span class='tag '>活跃营业部</span></td></tr><tr><td><b>炒股养家</b></td><td class='mono' title='华泰证券股份有限公司上海浦东新区世纪大道证券营业部'>华泰证券股份有限公司上海浦东新区世纪大道…</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +12,047</td><td>宁波华翔(002048)</td><td><span class='tag seat'>席位-买入</span></td></tr><tr><td><b>炒股养家</b></td><td class='mono' title='华泰证券股份有限公司上海浦东新区世纪大道证券营业部'>华泰证券股份有限公司上海浦东新区世纪大道…</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +12,047</td><td>宁波华翔(002048)</td><td><span class='tag '>活跃营业部</span></td></tr><tr><td><b>章盟主</b></td><td class='mono' title='国泰海通证券股份有限公司上海长宁区江苏路证券营业部'>国泰海通证券股份有限公司上海长宁区江苏路…</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -9,400</td><td>雪人集团(002639)</td><td><span class='tag seat'>席位-卖出</span></td></tr><tr><td><b>北向资金</b></td><td class='mono' title='深股通专用'>深股通专用</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +8,464</td><td>东方海洋(002086)</td><td><span class='tag seat'>席位-买入</span></td></tr><tr><td><b>北向资金</b></td><td class='mono' title='深股通专用'>深股通专用</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +8,047</td><td>富瀚微(300613)</td><td><span class='tag seat'>席位-买入</span></td></tr><tr><td><b>章盟主</b></td><td class='mono' title='国泰海通证券股份有限公司上海长宁区江苏路证券营业部'>国泰海通证券股份有限公司上海长宁区江苏路…</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +6,635</td><td>中青宝(300052)</td><td><span class='tag seat'>席位-买入</span></td></tr><tr><td><b>炒股养家</b></td><td class='mono' title='高盛(中国)证券有限责任公司上海浦东新区世纪大道证券营业部'>高盛(中国)证券有限责任公司上海浦东新区…</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -6,493</td><td>大晟文化(600892)、安泰集团(6004</td><td><span class='tag '>活跃营业部</span></td></tr><tr><td><b>章盟主</b></td><td class='mono' title='国泰海通证券股份有限公司上海长宁区江苏路证券营业部'>国泰海通证券股份有限公司上海长宁区江苏路…</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +5,660</td><td>富瀚微(300613)</td><td><span class='tag seat'>席位-买入</span></td></tr><tr><td><b>章盟主</b></td><td class='mono' title='国泰海通证券股份有限公司上海长宁区江苏路证券营业部'>国泰海通证券股份有限公司上海长宁区江苏路…</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -5,635</td><td>通则康威(301718)</td><td><span class='tag seat'>席位-卖出</span></td></tr><tr><td><b>章盟主</b></td><td class='mono' title='国泰海通证券股份有限公司上海长宁区江苏路证券营业部'>国泰海通证券股份有限公司上海长宁区江苏路…</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -5,029</td><td>澳洋健康(002172)</td><td><span class='tag seat'>席位-卖出</span></td></tr><tr><td><b>北向资金</b></td><td class='mono' title='沪股通专用'>沪股通专用</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +4,702</td><td>龙迅股份(688486)</td><td><span class='tag seat'>席位-买入</span></td></tr></tbody>
+</table>
   <div class="note">金额单位：万元。来源标注 <span class="tag seat">席位</span>
     为「该股票单票口径」，可跨游资横向比较。</div>
 </div>
@@ -158,7 +163,7 @@
 <table>
   <thead><tr><th>代码</th><th>名称</th><th style="text-align:right">连板</th>
     <th>行业</th><th style="text-align:right">封单</th><th>盯盘理由</th></tr></thead>
-  <tbody><tr><td class='mono'>603366</td><td><b>日出东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>4 板</td><td>厨卫电器</td><td style='text-align:right'>13.96 亿</td><td class='mono'>空间板4连·封单超3亿</td></tr><tr><td class='mono'>600327</td><td><b>大东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>4 板</td><td>一般零售</td><td style='text-align:right'>1.94 亿</td><td class='mono'>空间板4连</td></tr><tr><td class='mono'>002623</td><td><b>亚玛顿</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>光伏设备</td><td style='text-align:right'>2.51 亿</td><td class='mono'>3连板</td></tr><tr><td class='mono'>600715</td><td><b>文投控股</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>游戏Ⅱ</td><td style='text-align:right'>2.24 亿</td><td class='mono'>3连板</td></tr><tr><td class='mono'>002931</td><td><b>锋龙股份</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>通用设备</td><td style='text-align:right'>2.17 亿</td><td class='mono'>3连板·相对最强方向</td></tr></tbody>
+  <tbody><tr><td class='mono'>002578</td><td><b>闽发铝业</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>7 板</td><td>工业金属</td><td style='text-align:right'>0.94 亿</td><td class='mono'>空间板7连</td></tr><tr><td class='mono'>603366</td><td><b>日出东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>厨卫电器</td><td style='text-align:right'>7.80 亿</td><td class='mono'>3连板·封单超3亿</td></tr><tr><td class='mono'>002310</td><td><b>东方新能</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>电力</td><td style='text-align:right'>3.24 亿</td><td class='mono'>3连板·封单超3亿</td></tr><tr><td class='mono'>600327</td><td><b>大东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>一般零售</td><td style='text-align:right'>2.17 亿</td><td class='mono'>3连板</td></tr><tr><td class='mono'>601188</td><td><b>龙江交通</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>铁路公路</td><td style='text-align:right'>0.14 亿</td><td class='mono'>3连板</td></tr></tbody>
 </table>
 </div>
 <footer>
@@ -575,21 +580,9 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                     }
                 },
                 {
-                    "value": 93,
+                    "value": 88,
                     "itemStyle": {
                         "color": "#f6465d",
-                        "borderRadius": [
-                            3,
-                            3,
-                            0,
-                            0
-                        ]
-                    }
-                },
-                {
-                    "value": 51,
-                    "itemStyle": {
-                        "color": "#4c9aff",
                         "borderRadius": [
                             3,
                             3,
@@ -748,11 +741,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                 ],
                 [
                     "11-10",
-                    16.96
-                ],
-                [
-                    "11-11",
-                    26.09
+                    17.76
                 ]
             ],
             "hoverAnimation": true,
@@ -879,7 +868,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "appendToBody": false,
         "transitionDuration": 0.4,
         "displayTransition": true,
-        "formatter": function(ps){  var i = ps[0].dataIndex;  var st = ["震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "回暖", "退潮", "高潮", "回暖", "震荡", "退潮", "退潮", "退潮", "高潮", "震荡", "震荡", "震荡", "震荡", "震荡", "高潮", "回暖"];  var mo = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.56, -1.85, 3.38, 2.5, 1.36, 2.33, -0.65, -0.68, 2.83, 0.95, -0.32, 4.42, -0.15, 4.17, null, 2.65];  var out = '<b>' + ps[0].axisValue + '</b>　' + st[i] + '<br/>';  for (var k = 0; k < ps.length; k++) {    var s = ps[k].seriesName;    var v = (s.indexOf('炸板率') >= 0) ? (ps[k].value + '%') : (ps[k].value + ' 家');    out += ps[k].marker + s + '：<b>' + v + '</b><br/>';  }  out += '赚钱效应：<b>' + (mo[i] >= 0 ? '+' : '') + mo[i] + '%</b>';  return out;},
+        "formatter": function(ps){  var i = ps[0].dataIndex;  var st = ["震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "回暖", "退潮", "高潮", "回暖", "震荡", "退潮", "退潮", "退潮", "高潮", "震荡", "震荡", "震荡", "震荡", "震荡", "高潮"];  var mo = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.56, -1.85, 3.38, 2.5, 1.36, 2.33, -0.65, -0.68, 2.83, 0.95, -0.32, 4.42, -0.15, 4.17, 5.0];  var out = '<b>' + ps[0].axisValue + '</b>　' + st[i] + '<br/>';  for (var k = 0; k < ps.length; k++) {    var s = ps[k].seriesName;    var v = (s.indexOf('炸板率') >= 0) ? (ps[k].value + '%') : (ps[k].value + ' 家');    out += ps[k].marker + s + '：<b>' + v + '</b><br/>';  }  out += '赚钱效应：<b>' + (mo[i] >= 0 ? '+' : '') + mo[i] + '%</b>';  return out;},
         "textStyle": {
             "color": "#e6edf3",
             "fontSize": 12,
@@ -979,8 +968,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                 "11-05",
                 "11-06",
                 "11-09",
-                "11-10",
-                "11-11"
+                "11-10"
             ]
         }
     ],
@@ -1163,7 +1151,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
             "legendHoverLink": true,
             "data": [
                 {
-                    "value": 35,
+                    "value": 69,
                     "itemStyle": {
                         "color": "#3d7fd1",
                         "borderRadius": [
@@ -1175,7 +1163,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                     }
                 },
                 {
-                    "value": 9,
+                    "value": 14,
                     "itemStyle": {
                         "color": "#f08a5d",
                         "borderRadius": [
@@ -1187,21 +1175,9 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                     }
                 },
                 {
-                    "value": 5,
+                    "value": 4,
                     "itemStyle": {
-                        "color": "#f6465d",
-                        "borderRadius": [
-                            4,
-                            4,
-                            0,
-                            0
-                        ]
-                    }
-                },
-                {
-                    "value": 2,
-                    "itemStyle": {
-                        "color": "#f6465d",
+                        "color": "#3d7fd1",
                         "borderRadius": [
                             4,
                             4,
@@ -1226,6 +1202,30 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                     "value": 0,
                     "itemStyle": {
                         "color": "#2b3648",
+                        "borderRadius": [
+                            4,
+                            4,
+                            0,
+                            0
+                        ]
+                    }
+                },
+                {
+                    "value": 0,
+                    "itemStyle": {
+                        "color": "#2b3648",
+                        "borderRadius": [
+                            4,
+                            4,
+                            0,
+                            0
+                        ]
+                    }
+                },
+                {
+                    "value": 1,
+                    "itemStyle": {
+                        "color": "#f6465d",
                         "borderRadius": [
                             4,
                             4,
@@ -1307,7 +1307,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "appendToBody": false,
         "transitionDuration": 0.4,
         "displayTransition": true,
-        "formatter": function(p){  var names = ["剑桥科技(603083)、天洋新材(603330)、北纬科技(002148)、金辰股份(603396)、蓝黛科技(002765)、宁波东力(002164)、日发精机(002520)、名臣健康(002919)、三峡新材(600293)、青山纸业(600103)、胜通能源(001331)、汉王科技(002362)、顺发恒能(000631)、三钢闽光(002110)、瑞迪智驱(301596)、华脉科技(603042)、星光股份(002076)、报 喜 鸟(002154)、华建集团(600629)、飞亚达(000026)、三联锻造(001282)、日上集团(002593)、中重科技(603135)、东易日盛(002713)、天安新材(603725)、赛福天(603028)、凯盛新能(600876)、申科股份(002633)、神开股份(002278)、泽润新能(301636)、金浦钛业(000545)、康欣新材(600076)、英 力 特(000635)、海源复材(002529)、金麒麟(603586)", "达 意 隆(002209)、惠发食品(603536)、襄阳轴承(000678)、日海智能(002313)、风语筑(603466)、凯撒文化(002425)、瀛通通讯(002861)、常铝股份(002160)、天普股份(605255)", "亚玛顿(002623)、文投控股(600715)、锋龙股份(002931)、光洋股份(002708)、东方环宇(603706)", "日出东方(603366)、大东方(600327)", "该高度今日断档（0 家）", "该高度今日断档（0 家）"];  var famt = [56.79, 13.18, 8.93, 15.9, 0.0, 0.0];  var i = p.dataIndex;  if (p.value === 0) {    return '<b>' + p.name + '</b><br/><span style="color:#8b98a8">今日断档，无个股</span>';  }  return '<b>' + p.name + '</b>　' + p.value + ' 家<br/>' +         '封板资金合计：<b>' + famt[i] + ' 亿</b><br/>' +         '<span style="color:#8b98a8">' + names[i] + '</span>';},
+        "formatter": function(p){  var names = ["瑞芯微(603893)、阳光照明(600261)、襄阳轴承(000678)、九安医疗(002432)、富瀚微(300613)、掌阅科技(603533)、天奇股份(002009)、风语筑(603466)、创维数字(000810)、慈文传媒(002343)、达 意 隆(002209)、常铝股份(002160)、嘉立创(001232)、科瑞思(301314)、新北洋(002376)、福莱新材(605488)、智微智能(001339)、钧达股份(002865)、上海港湾(605598)、国光电器(002045)、天地在线(002995)、德龙汇能(000593)、香山股份(002870)、凯众股份(603037)、华体科技(603679)、佳创视讯(300264)、纵横通信(603602)、通力科技(301255)、瀛通通讯(002861)、阳光乳业(001318)、视涯科技-UW(688781)、华智数媒(300426)、亿嘉和(603666)、朝阳科技(002981)、协和电子(605258)、德尔未来(002631)、宜宾纸业(600793)、凯撒文化(002425)、赛腾股份(603283)、奥佳华(002614)、林州重机(002535)、惠发食品(603536)、亿道信息(001314)、黑牡丹(600510)、新炬网络(605398)、中青宝(300052)、豪能股份(603809)、联创电子(002036)、日海智能(002313)、友好集团(600778)、杭州柯林(688611)、引力传媒(603598)、恒申新材(000782)、人民同泰(600829)、丝路视觉(300556)、普利特(002324)、大千生态(603955)、金逸影视(002905)、康冠科技(001308)、大业股份(603278)、永臻股份(603381)、中捷资源(002021)、三利谱(002876)、永吉股份(603058)、天普股份(605255)、信质集团(002664)、宁波华翔(002048)、比依股份(603215)、美盈森(002303)", "光洋股份(002708)、亚玛顿(002623)、文投控股(600715)、锋龙股份(002931)、冰山冷热(000530)、泰尔股份(002347)、华培动力(603121)、金杯汽车(600609)、安泰集团(600408)、大晟文化(600892)、腾达科技(001379)、东方环宇(603706)、日盈电子(603286)、拓山重工(001226)", "日出东方(603366)、东方新能(002310)、大东方(600327)、龙江交通(601188)", "该高度今日断档（0 家）", "该高度今日断档（0 家）", "该高度今日断档（0 家）", "闽发铝业(002578)"];  var famt = [44.62, 11.73, 13.34, 0.0, 0.0, 0.0, 0.94];  var i = p.dataIndex;  if (p.value === 0) {    return '<b>' + p.name + '</b><br/><span style="color:#8b98a8">今日断档，无个股</span>';  }  return '<b>' + p.name + '</b>　' + p.value + ' 家<br/>' +         '封板资金合计：<b>' + famt[i] + ' 亿</b><br/>' +         '<span style="color:#8b98a8">' + names[i] + '</span>';},
         "textStyle": {
             "color": "#e6edf3",
             "fontSize": 12,
@@ -1384,7 +1384,8 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                 "3\u677f",
                 "4\u677f",
                 "5\u677f",
-                "6\u677f"
+                "6\u677f",
+                "7\u677f"
             ]
         }
     ],
@@ -1454,7 +1455,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
             "show": true,
             "text": "\u8fde\u677f\u5929\u68af",
             "target": "blank",
-            "subtext": "\u5404\u9ad8\u5ea6\u6da8\u505c\u5bb6\u6570",
+            "subtext": "\u5404\u9ad8\u5ea6\u6da8\u505c\u5bb6\u6570 \u00b7 \u65ad\u6863\uff1a4\u677f/5\u677f/6\u677f",
             "subtarget": "blank",
             "left": "1.2%",
             "top": 8,
@@ -1484,8 +1485,924 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "containLabel": true
     }
 });charts.push(c);})();
-    (function(){var el = document.getElementById('c_sankey');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({"backgroundColor": "transparent", "title": {"text": "无个股席位数据 —— 桑基图需要「游资×股票×金额」三元组\n请去掉 --no-seat 重新运行（会联网抓取龙虎榜个股买卖前五席位）", "left": "center", "top": "middle", "textStyle": {"color": "#8b98a8", "fontSize": 13, "fontWeight": "normal", "lineHeight": 22}}});charts.push(c);})();
-    (function(){var el = document.getElementById('c_heat');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({"backgroundColor": "transparent", "title": {"text": "无个股席位数据 —— 热力图需要「游资×股票×金额」三元组\n请去掉 --no-seat 重新运行", "left": "center", "top": "middle", "textStyle": {"color": "#8b98a8", "fontSize": 13, "fontWeight": "normal", "lineHeight": 22}}});charts.push(c);})();
+    (function(){var el = document.getElementById('c_sankey');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({
+    "backgroundColor": "transparent",
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "sankey",
+            "name": "\u51c0\u4e70\u5165\u6d41\u5411",
+            "data": [
+                {
+                    "name": "\u7ae0\u76df\u4e3b",
+                    "itemStyle": {
+                        "color": "#f6465d"
+                    }
+                },
+                {
+                    "name": "\u7092\u80a1\u517b\u5bb6",
+                    "itemStyle": {
+                        "color": "#f6465d"
+                    }
+                },
+                {
+                    "name": "\u5317\u5411\u8d44\u91d1",
+                    "itemStyle": {
+                        "color": "#f6465d"
+                    }
+                },
+                {
+                    "name": "\u673a\u6784",
+                    "itemStyle": {
+                        "color": "#f6465d"
+                    }
+                },
+                {
+                    "name": "\u62c9\u8428\u5929\u56e2(\u6563\u6237/\u5bf9\u5012)",
+                    "itemStyle": {
+                        "color": "#f6465d"
+                    }
+                },
+                {
+                    "name": "\u4f5c\u624b\u65b0\u4e00",
+                    "itemStyle": {
+                        "color": "#f6465d"
+                    }
+                },
+                {
+                    "name": "\u6d59\u6587\u5f71\u4e1a(601599)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u5b81\u6ce2\u534e\u7fd4(002048)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u4e1c\u65b9\u6d77\u6d0b(002086)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u5bcc\u701a\u5fae(300613)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u4e2d\u9752\u5b9d(300052)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u9f99\u8fc5\u80a1\u4efd(688486)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u4e5d\u5b89\u533b\u7597(002432)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u5b89\u6cf0\u96c6\u56e2(600408)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u51e1\u62d3\u6570\u521b(301313)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u4e1c\u65b9\u65e5\u5347(300118)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                },
+                {
+                    "name": "\u9f99\u6c5f\u4ea4\u901a(601188)",
+                    "itemStyle": {
+                        "color": "#3d7fd1"
+                    }
+                }
+            ],
+            "links": [
+                {
+                    "source": "\u7ae0\u76df\u4e3b",
+                    "target": "\u6d59\u6587\u5f71\u4e1a(601599)",
+                    "value": 12896.9,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u7092\u80a1\u517b\u5bb6",
+                    "target": "\u5b81\u6ce2\u534e\u7fd4(002048)",
+                    "value": 12046.8,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u5317\u5411\u8d44\u91d1",
+                    "target": "\u4e1c\u65b9\u6d77\u6d0b(002086)",
+                    "value": 8464.4,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u5317\u5411\u8d44\u91d1",
+                    "target": "\u5bcc\u701a\u5fae(300613)",
+                    "value": 8047.3,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u7ae0\u76df\u4e3b",
+                    "target": "\u4e2d\u9752\u5b9d(300052)",
+                    "value": 6635.0,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u7ae0\u76df\u4e3b",
+                    "target": "\u5bcc\u701a\u5fae(300613)",
+                    "value": 5660.5,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u5317\u5411\u8d44\u91d1",
+                    "target": "\u9f99\u8fc5\u80a1\u4efd(688486)",
+                    "value": 4702.0,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u673a\u6784",
+                    "target": "\u9f99\u8fc5\u80a1\u4efd(688486)",
+                    "value": 4697.2,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u673a\u6784",
+                    "target": "\u5bcc\u701a\u5fae(300613)",
+                    "value": 3229.3,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u673a\u6784",
+                    "target": "\u4e5d\u5b89\u533b\u7597(002432)",
+                    "value": 2829.7,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u7092\u80a1\u517b\u5bb6",
+                    "target": "\u5b89\u6cf0\u96c6\u56e2(600408)",
+                    "value": 2432.5,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u62c9\u8428\u5929\u56e2(\u6563\u6237/\u5bf9\u5012)",
+                    "target": "\u51e1\u62d3\u6570\u521b(301313)",
+                    "value": 2191.4,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u62c9\u8428\u5929\u56e2(\u6563\u6237/\u5bf9\u5012)",
+                    "target": "\u4e1c\u65b9\u65e5\u5347(300118)",
+                    "value": 2072.5,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u7092\u80a1\u517b\u5bb6",
+                    "target": "\u9f99\u8fc5\u80a1\u4efd(688486)",
+                    "value": 1989.7,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u62c9\u8428\u5929\u56e2(\u6563\u6237/\u5bf9\u5012)",
+                    "target": "\u9f99\u6c5f\u4ea4\u901a(601188)",
+                    "value": 1988.0,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                },
+                {
+                    "source": "\u4f5c\u624b\u65b0\u4e00",
+                    "target": "\u4e2d\u9752\u5b9d(300052)",
+                    "value": 1820.9,
+                    "lineStyle": {
+                        "color": "gradient",
+                        "opacity": 0.28
+                    }
+                }
+            ],
+            "left": "6%",
+            "top": "20%",
+            "right": "24%",
+            "bottom": "7%",
+            "nodeWidth": 13,
+            "nodeGap": 15,
+            "nodeAlign": "justify",
+            "orient": "horizontal",
+            "draggable": true,
+            "zoom": 1,
+            "roam": false,
+            "label": {
+                "show": true,
+                "position": "right",
+                "color": "#e6edf3",
+                "margin": 8,
+                "fontSize": 10.5,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "lineStyle": {
+                "show": false,
+                "opacity": 0.28,
+                "curveness": 0.5,
+                "color": "gradient"
+            },
+            "itemStyle": {
+                "borderWidth": 0
+            }
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "\u51c0\u4e70\u5165\u6d41\u5411"
+            ],
+            "selected": {},
+            "show": false,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "formatter": function(p){  if (p.dataType === 'edge') {    return p.data.source + ' → ' + p.data.target + '<br/>净买入 <b>' + p.data.value + ' 万元</b>';  }  return '<b>' + p.name + '</b>';},
+        "textStyle": {
+            "color": "#e6edf3",
+            "fontSize": 12,
+            "richInheritPlainLabel": true
+        },
+        "backgroundColor": "#1b2431",
+        "borderColor": "#243040",
+        "borderWidth": 1,
+        "padding": 5,
+        "extraCssText": "box-shadow:0 8px 24px rgba(0,0,0,.5);border-radius:8px;",
+        "order": "seriesAsc"
+    },
+    "title": [
+        {
+            "show": true,
+            "text": "\u6e38\u8d44\u4e70\u5165\u6d41\u5411",
+            "target": "blank",
+            "subtext": "\u5de6=\u6e38\u8d44 \u00b7 \u53f3=\u4e2a\u80a1 \u00b7 \u7ebf\u5bbd=\u51c0\u4e70\u5165\u91d1\u989d\uff08\u4e07\u5143\uff09",
+            "subtarget": "blank",
+            "left": "1.2%",
+            "top": 8,
+            "padding": 5,
+            "itemGap": 7,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#e6edf3",
+                "fontWeight": "bold",
+                "fontSize": 15,
+                "richInheritPlainLabel": true
+            },
+            "subtextStyle": {
+                "color": "#8b98a8",
+                "fontSize": 10.5,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+});charts.push(c);})();
+    (function(){var el = document.getElementById('c_heat');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({
+    "backgroundColor": "transparent",
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "heatmap",
+            "name": "\u51c0\u4e70\u5165(\u4e07)",
+            "coordinateSystem": "cartesian2d",
+            "data": [
+                [
+                    0,
+                    0,
+                    2406.8
+                ],
+                [
+                    2,
+                    0,
+                    8047.3
+                ],
+                [
+                    3,
+                    0,
+                    2275.5
+                ],
+                [
+                    4,
+                    0,
+                    4702.0
+                ],
+                [
+                    5,
+                    0,
+                    8464.4
+                ],
+                [
+                    7,
+                    0,
+                    3653.4
+                ],
+                [
+                    9,
+                    0,
+                    2861.4
+                ],
+                [
+                    11,
+                    0,
+                    2120.6
+                ],
+                [
+                    14,
+                    0,
+                    3290.9
+                ],
+                [
+                    16,
+                    0,
+                    72.0
+                ],
+                [
+                    0,
+                    1,
+                    1132.1
+                ],
+                [
+                    2,
+                    1,
+                    3229.3
+                ],
+                [
+                    3,
+                    1,
+                    2493.5
+                ],
+                [
+                    4,
+                    1,
+                    4697.2
+                ],
+                [
+                    5,
+                    1,
+                    2027.3
+                ],
+                [
+                    6,
+                    1,
+                    1057.0
+                ],
+                [
+                    7,
+                    1,
+                    2235.6
+                ],
+                [
+                    8,
+                    1,
+                    1699.6
+                ],
+                [
+                    9,
+                    1,
+                    1625.3
+                ],
+                [
+                    10,
+                    1,
+                    976.5
+                ],
+                [
+                    11,
+                    1,
+                    2829.7
+                ],
+                [
+                    15,
+                    1,
+                    -738.2
+                ],
+                [
+                    16,
+                    1,
+                    -1831.9
+                ],
+                [
+                    17,
+                    1,
+                    136.4
+                ],
+                [
+                    0,
+                    2,
+                    3048.7
+                ],
+                [
+                    1,
+                    2,
+                    12896.9
+                ],
+                [
+                    2,
+                    2,
+                    5660.5
+                ],
+                [
+                    3,
+                    2,
+                    -9400.1
+                ],
+                [
+                    6,
+                    2,
+                    6635.0
+                ],
+                [
+                    7,
+                    2,
+                    213.2
+                ],
+                [
+                    8,
+                    2,
+                    -5634.6
+                ],
+                [
+                    10,
+                    2,
+                    -5028.8
+                ],
+                [
+                    17,
+                    2,
+                    2432.2
+                ],
+                [
+                    0,
+                    3,
+                    12046.8
+                ],
+                [
+                    1,
+                    3,
+                    -4107.0
+                ],
+                [
+                    4,
+                    3,
+                    1989.7
+                ],
+                [
+                    12,
+                    3,
+                    -4011.4
+                ],
+                [
+                    13,
+                    3,
+                    2432.5
+                ],
+                [
+                    3,
+                    4,
+                    762.9
+                ],
+                [
+                    9,
+                    4,
+                    2072.5
+                ],
+                [
+                    11,
+                    4,
+                    -422.1
+                ],
+                [
+                    13,
+                    4,
+                    -997.1
+                ],
+                [
+                    15,
+                    4,
+                    1882.6
+                ],
+                [
+                    16,
+                    4,
+                    1046.7
+                ],
+                [
+                    7,
+                    5,
+                    -1995.1
+                ],
+                [
+                    6,
+                    6,
+                    1820.9
+                ]
+            ],
+            "label": {
+                "show": true,
+                "color": "#e6edf3",
+                "margin": 8,
+                "fontSize": 10,
+                "formatter": function(p){  var v = p.value[2];  var a = Math.abs(v);  var s = a >= 10000 ? (a / 10000).toFixed(2) + '亿' : Math.round(a) + '万';  return (v > 0 ? '+' : '-') + s;},
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "selectedMode": false,
+            "zlevel": 0,
+            "z": 2
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "\u51c0\u4e70\u5165(\u4e07)"
+            ],
+            "selected": {},
+            "show": false,
+            "padding": 5,
+            "itemGap": 10,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "item",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "line"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "formatter": function(p){  var keys = ["宁波华翔(002048)", "浙文影业(601599)", "富瀚微(300613)", "雪人集团(002639)", "龙迅股份(688486)", "东方海洋(002086)", "中青宝(300052)", "康冠科技(001308)", "通则康威(301718)", "东方日升(300118)", "澳洋健康(002172)", "九安医疗(002432)", "大晟文化(600892)", "安泰集团(600408)", "文投控股(600715)", "凡拓数创(301313)", "贝特利(301697)", "肯特股份(301591)"];  var v = p.value[2];  var col = v > 0 ? '#f6465d' : '#0ecb81';  var a = Math.abs(v);  var amt = a >= 10000 ? (a / 10000).toFixed(2) + ' 亿元' : a.toFixed(0) + ' 万元';  return '<b>' + p.value[1] + '</b><br/>' + keys[p.value[0]] + '<br/>' +         '净额 <b style="color:' + col + '">' + (v > 0 ? '+' : '-') + amt + '</b>';},
+        "textStyle": {
+            "color": "#e6edf3",
+            "fontSize": 12,
+            "richInheritPlainLabel": true
+        },
+        "backgroundColor": "#1b2431",
+        "borderColor": "#243040",
+        "borderWidth": 1,
+        "padding": 5,
+        "extraCssText": "box-shadow:0 8px 24px rgba(0,0,0,.5);border-radius:8px;",
+        "order": "seriesAsc"
+    },
+    "xAxis": [
+        {
+            "type": "category",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLine": {
+                "show": true,
+                "onZero": true,
+                "onZeroAxisIndex": 0,
+                "lineStyle": {
+                    "show": false,
+                    "color": "#243040"
+                }
+            },
+            "axisTick": {
+                "show": false,
+                "alignWithLabel": false,
+                "inside": false
+            },
+            "axisLabel": {
+                "show": true,
+                "color": "#8b98a8",
+                "rotate": 34,
+                "margin": 8,
+                "interval": 0,
+                "fontSize": 10,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": false,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "splitArea": {
+                "show": false,
+                "areaStyle": {
+                    "opacity": 0
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0,
+            "data": [
+                "\u5b81\u6ce2\u534e\u7fd4",
+                "\u6d59\u6587\u5f71\u4e1a",
+                "\u5bcc\u701a\u5fae",
+                "\u96ea\u4eba\u96c6\u56e2",
+                "\u9f99\u8fc5\u80a1\u4efd",
+                "\u4e1c\u65b9\u6d77\u6d0b",
+                "\u4e2d\u9752\u5b9d",
+                "\u5eb7\u51a0\u79d1\u6280",
+                "\u901a\u5219\u5eb7\u5a01",
+                "\u4e1c\u65b9\u65e5\u5347",
+                "\u6fb3\u6d0b\u5065\u5eb7",
+                "\u4e5d\u5b89\u533b\u7597",
+                "\u5927\u665f\u6587\u5316",
+                "\u5b89\u6cf0\u96c6\u56e2",
+                "\u6587\u6295\u63a7\u80a1",
+                "\u51e1\u62d3\u6570\u521b",
+                "\u8d1d\u7279\u5229",
+                "\u80af\u7279\u80a1\u4efd"
+            ]
+        }
+    ],
+    "yAxis": [
+        {
+            "type": "category",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "axisLine": {
+                "show": true,
+                "onZero": true,
+                "onZeroAxisIndex": 0,
+                "lineStyle": {
+                    "show": false,
+                    "color": "#243040"
+                }
+            },
+            "axisTick": {
+                "show": false,
+                "alignWithLabel": false,
+                "inside": false
+            },
+            "axisLabel": {
+                "show": true,
+                "color": "#8b98a8",
+                "margin": 8,
+                "fontSize": 11,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": false,
+                "lineStyle": {
+                    "show": false
+                }
+            },
+            "splitArea": {
+                "show": false,
+                "areaStyle": {
+                    "opacity": 0
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0,
+            "data": [
+                "\u5317\u5411\u8d44\u91d1",
+                "\u673a\u6784",
+                "\u7ae0\u76df\u4e3b",
+                "\u7092\u80a1\u517b\u5bb6",
+                "\u62c9\u8428\u5929\u56e2",
+                "\u4e54\u5e2e\u4e3b",
+                "\u4f5c\u624b\u65b0\u4e00"
+            ]
+        }
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\u6e38\u8d44 \u00d7 \u4e2a\u80a1 \u4e70\u5356\u77e9\u9635",
+            "target": "blank",
+            "subtext": "\u7ea2=\u51c0\u4e70\u5165 \u00b7 \u7eff=\u51c0\u5356\u51fa \u00b7 \u7a7a\u767d=\u8be5\u5e2d\u4f4d\u672a\u53c2\u4e0e\u8be5\u80a1 \u00b7 \u60ac\u505c\u770b\u5168\u79f0",
+            "subtarget": "blank",
+            "left": "1.2%",
+            "top": 8,
+            "padding": 5,
+            "itemGap": 7,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#e6edf3",
+                "fontWeight": "bold",
+                "fontSize": 15,
+                "richInheritPlainLabel": true
+            },
+            "subtextStyle": {
+                "color": "#8b98a8",
+                "fontSize": 10.5,
+                "richInheritPlainLabel": true
+            }
+        }
+    ],
+    "visualMap": {
+        "show": true,
+        "type": "continuous",
+        "min": -12896.9,
+        "max": 12896.9,
+        "textStyle": {
+            "color": "#8b98a8",
+            "fontSize": 10,
+            "richInheritPlainLabel": true
+        },
+        "inRange": {
+            "color": [
+                "#0ecb81",
+                "#1b2431",
+                "#f6465d"
+            ]
+        },
+        "calculable": true,
+        "inverse": false,
+        "splitNumber": 5,
+        "hoverLink": true,
+        "orient": "vertical",
+        "bottom": "10%",
+        "right": "1%",
+        "padding": 5,
+        "showLabel": true,
+        "itemWidth": 11,
+        "itemHeight": 90,
+        "borderWidth": 0
+    },
+    "grid": {
+        "top": "19%",
+        "left": "5%",
+        "right": "7%",
+        "bottom": "9%",
+        "containLabel": true
+    }
+});charts.push(c);})();
     window.addEventListener('resize', function(){
       charts.forEach(function(c){ try{ c.resize(); }catch(e){} });
     });
@@ -1496,6 +2413,6 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   } else { boot(); }
 })();
 </script>
-<div style="position:fixed;right:12px;bottom:12px;z-index:99999;background:rgba(19,26,36,.82);border:1px solid rgba(36,48,64,.9);color:#8b98a8;font:10.5px/1.55 system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;padding:3px 10px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;backdrop-filter:blur(3px);letter-spacing:.2px;">数据日期 2026-11-11 &nbsp;·&nbsp; 更新于 2026-11-11 13:08</div>
+<div style="position:fixed;right:12px;bottom:12px;z-index:99999;background:rgba(19,26,36,.82);border:1px solid rgba(36,48,64,.9);color:#8b98a8;font:10.5px/1.55 system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;padding:3px 10px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;backdrop-filter:blur(3px);letter-spacing:.2px;">数据日期 2026-11-10 &nbsp;·&nbsp; 更新于 2026-11-11 13:22</div>
 </body>
 </html>

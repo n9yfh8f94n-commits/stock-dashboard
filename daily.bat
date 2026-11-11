@@ -26,6 +26,28 @@ setlocal
 cd /d "%~dp0"
 set PYTHONIOENCODING=utf-8
 
+rem ===========================================================================
+rem  INTRADAY GUARD  - must be the FIRST action, before anything reads/writes data
+rem ---------------------------------------------------------------------------
+rem  2026-11-11 13:06 accident: a desktop shortcut ran during trading hours,
+rem  a half-day snapshot was written into metrics_history.csv and pushed live.
+rem
+rem  guard_popup.py reuses utils.guard_intraday (single source of truth) and
+rem  shows a Chinese MessageBox. Exit codes:
+rem      0 = proceed
+rem      2 = blocked. We exit with 0 on purpose so run_silent.vbs does NOT
+rem          pop a second "Run failed" dialog - the guard message is enough.
+rem ===========================================================================
+python "%~dp0guard_popup.py" %*
+set "GRC=%ERRORLEVEL%"
+if "%GRC%"=="2" exit /b 0
+if not "%GRC%"=="0" (
+    echo [ERROR] Intraday guard script failed with code %GRC%.
+    echo         Nothing was run. Check logs\review.log.
+    pause
+    exit /b 1
+)
+
 rem ---- optional switch: --no-push skips step 3 ----
 set DOPUSH=1
 set PUSHOK=1

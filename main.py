@@ -40,6 +40,7 @@ from data_fetch import fetch_all, probe_zt_available
 from utils import (
     fmt_money,
     fmt_pct,
+    guard_intraday,
     get_trade_calendar,
     is_trade_date,
     latest_trade_date,
@@ -1095,8 +1096,28 @@ def run_check(day_str: str) -> int:
     return 0
 
 
-def run_review(day_str: str, use_seat: bool = True) -> Optional[Path]:
-    """复盘主流程：抓数 -> 分析 -> 游资 -> 渲染 -> 落盘。"""
+def run_review(day_str: str, use_seat: bool = True,
+               allow_intraday: bool = False) -> Optional[Path]:
+    """
+    复盘主流程：抓数 -> 分析 -> 游资 -> 渲染 -> 落盘。
+
+    【盘中防呆】这是整个系统的最后一道防线。
+    2026-11-11 13:06 的事故就是从这里进去的：盘中跑了一次，
+    把半天的涨停池写进了 metrics_history.csv 并推到 GitHub。
+    无论调用方是 daily.bat、桌面快捷方式、定时任务还是裸 python，
+    最终都会走到这里，所以闸设在这里最有效。
+    """
+    # ---------- 0. 盘中防呆 ----------
+    allowed, reason = guard_intraday(day_str, allow_intraday=allow_intraday)
+    if not allowed:
+        logger.error("=" * 68)
+        for line in reason.splitlines():
+            logger.error(line)
+        logger.error("=" * 68)
+        return None
+    if reason:
+        logger.warning(reason)
+
     t_start = time.time()
     logger.info("🚀 开始生成 %s 复盘报告…", day_str)
 
@@ -1231,6 +1252,8 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="校准模式：遍历最近 N 个交易日（默认 30），输出分位数与阈值诊断")
     p.add_argument("--refresh", action="store_true", help="忽略本地缓存，强制重新抓取")
     p.add_argument("--no-seat", action="store_true", help="跳过第二层个股席位抓取（更快）")
+    p.add_argument("--allow-intraday", action="store_true",
+                   help="盘中强制运行（默认拒绝：交易日 15:00 前不跑当天，防止污染历史库）")
     return p
 
 
@@ -1272,7 +1295,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         run_calibration(day_str, days=n, refresh=args.refresh)
         return 0
 
-    path = run_review(day_str, use_seat=not args.no_seat)
+    path = run_review(day_str, use_seat=not args.no_seat, allow_intraday=args.allow_intraday)
     return 0 if path else 1
 
 

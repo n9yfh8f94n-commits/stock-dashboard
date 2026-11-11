@@ -23,11 +23,12 @@ from __future__ import annotations
 
 import functools
 import logging
+import os
 import random
 import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Any, Callable, Iterable, Optional
+from typing import Any, Callable, Iterable, Optional, Tuple
 
 import pandas as pd
 
@@ -524,3 +525,81 @@ def banner(text: str, width: int = 78) -> str:
     """生成控制台分隔标题，纯粹为了日志好看。"""
     line = "=" * width
     return f"\n{line}\n  {text}\n{line}"
+
+
+# ==============================================================================
+# 盘中防呆：交易日 15:00 前禁止复盘当天
+# ==============================================================================
+# 【为什么必须有这道闸】
+# 2026-11-11 13:06 实测事故：盘中双击快捷方式，抓到了半天的涨停池，
+# 写进 metrics_history.csv 并推送到 GitHub。
+# 脏数据的可怕之处在于「看起来完全正常」——
+#   涨停 51 家、炸板率 26.09%、情绪「回暖」，
+# 每一个数字都合理，只是它反映的是 13:06 那一刻，不是收盘。
+# 之后所有基于 metrics_history 的分位数校准都会被这一行带偏，且极难发现。
+#
+# 判定规则（三选一才放行）：
+#   ① 指定的是历史日期（不是今天）        -> 放行，补跑历史是合法需求
+#   ② 今天是非交易日                      -> 交给上层原有的交易日检查
+#   ③ 现在时间 >= MARKET_CLOSE_HOUR      -> 放行
+# 否则拒绝。
+
+# A股收盘时间。设为 15 表示 15:00 之后才允许跑当天。
+# 注意：15:00~16:00 之间东财的涨停池/龙虎榜还在陆续更新，
+# 严格来说 16:00 之后数据才稳定。这里取 15:00 是底线，
+# 想要更保险可以改成 16。
+MARKET_CLOSE_HOUR: int = int(os.environ.get("REVIEW_CLOSE_HOUR", "15"))
+
+
+def is_market_closed(now: Optional[datetime] = None,
+                     close_hour: int = MARKET_CLOSE_HOUR) -> bool:
+    """当前是否已过分收盘时间（默认 15:00）。"""
+    n = now or datetime.now()
+    return n.hour >= close_hour
+
+
+def is_weekend(d: Optional[date] = None) -> bool:
+    """周六/周日。注：节假日由 is_trade_date 另行判断。"""
+    dd = d or date.today()
+    return dd.weekday() >= 5
+
+
+def guard_intraday(day: date | str,
+                   allow_intraday: bool = False,
+                   now: Optional[datetime] = None) -> Tuple[bool, str]:
+    """
+    判断「能不能对 day 这一天跑复盘」。
+
+    返回 (allowed, reason)
+        allowed=False 时 reason 是给人看的中文说明
+
+    这是整个系统的最后一道防线：无论从 daily.bat、快捷方式、定时任务
+    还是直接 python main.py 进入，都会经过这里。
+    """
+    day_str = to_day_str(day)
+    now = now or datetime.now()
+    today_str = now.strftime("%Y%m%d")
+
+    # ---- 历史日期：一律放行（补跑历史是正常需求）----
+    if day_str != today_str:
+        return True, ""
+
+    if allow_intraday:
+        return True, "已显式指定 --allow-intraday，跳过盘中检查"
+
+    # ---- 周末 / 非交易日：交给上层原有的交易日校验 ----
+    if now.weekday() >= 5:
+        return True, ""
+
+    # ---- 交易日 + 今天 + 未到收盘时间 -> 拒绝 ----
+    if not is_market_closed(now):
+        return False, (
+            f"拒绝执行：{day_str} 尚未收盘（当前 {now.strftime('%H:%M')}，"
+            f"收盘时间 {MARKET_CLOSE_HOUR}:00）。\n"
+            f"盘中数据只是半天的快照，写进 metrics_history.csv 会污染历史指标库，\n"
+            f"而且那些数字看起来完全正常，事后极难发现。\n"
+            f"请等 {MARKET_CLOSE_HOUR}:00 之后再运行；\n"
+            f"如果确实要用盘中数据（例如只为了看图形），加参数 --allow-intraday。"
+        )
+
+    return True, ""
