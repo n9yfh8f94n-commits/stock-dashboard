@@ -61,6 +61,15 @@ DOCS_DIR = BASE_DIR / "docs"
 INDEX_FILE = DOCS_DIR / "index.html"
 NOJEKYLL_FILE = DOCS_DIR / ".nojekyll"
 
+# 历史归档：每天一份 YYYYMMDD.html，供页面顶部的「历史归档」导航使用。
+# 【为什么必须有】index.html 每次都被覆盖，昨天的报告就再也看不到了。
+# 归档让「最新」和「历史」并存，且全是纯静态文件，GitHub Pages 直接能服务。
+ARCHIVE_DIR = DOCS_DIR / "archive"
+ARCHIVE_NAME_FMT = "{day}.html"      # day = YYYYMMDD
+
+# 导航条上最多显示多少个日期按钮（再多的靠 archive/ 目录自己浏览）
+ARCHIVE_NAV_MAX = 40
+
 # git 命令超时：网络差时 push 可能挂很久，超时就放弃，别把 daily.bat 卡死
 GIT_TIMEOUT = 150
 
@@ -272,8 +281,151 @@ def inject_banner(html: str, day: str, mtime: float) -> str:
 # ==============================================================================
 # 发布
 # ==============================================================================
+# ==============================================================================
+# 历史归档导航
+# ==============================================================================
+# 纯静态实现：GitHub Pages 不能跑脚本，所以日期按钮必须在**生成网页时**写死。
+# deploy.py 每次运行都会扫一遍 docs/archive/，把已有日期拼成导航条注入页面。
+# 新增一个归档 -> 所有页面的导航不会自动更新，但只要当天再跑一次 deploy 就同步了
+# （daily.bat 每天都会跑，所以实际上一直是同步的）。
+NAV_CSS = (
+    "<style>"
+    ".anav{position:sticky;top:0;z-index:9998;display:flex;align-items:center;gap:6px;"
+    "padding:7px 12px;background:rgba(11,14,20,.96);border-bottom:1px solid #243040;"
+    "backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"
+    "overflow-x:auto;overflow-y:hidden;white-space:nowrap;"
+    "font:12px/1.6 system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;"
+    "-webkit-overflow-scrolling:touch}"
+    ".anav-t{color:#5b6577;flex:0 0 auto;margin-right:2px;letter-spacing:.5px}"
+    ".anav-l{flex:0 0 auto;display:inline-block;padding:3px 9px;border-radius:6px;"
+    "color:#9aa7b8;text-decoration:none;border:1px solid #243040;background:#0f131a}"
+    ".anav-l:hover{background:#18202b;color:#e6ebf2;border-color:#31404f}"
+    ".anav-l.active{background:#1f6feb;border-color:#1f6feb;color:#fff;font-weight:600}"
+    ".anav-l.latest{color:#3fb950;border-color:#1f4327}"
+    ".anav-l.latest.active{color:#fff;background:#238636;border-color:#238636}"
+    "@media(max-width:640px){.anav{padding:6px 8px;gap:4px}"
+    ".anav-l{padding:3px 7px;font-size:11px}}"
+    "</style>"
+)
+
+
+def list_archive_days() -> list[str]:
+    """返回 docs/archive/ 下所有 YYYYMMDD 归档，倒序（最新在前）。"""
+    if not ARCHIVE_DIR.exists():
+        return []
+    days = []
+    for p in ARCHIVE_DIR.glob("*.html"):
+        if re.fullmatch(r"\d{8}", p.stem):
+            days.append(p.stem)
+    return sorted(set(days), reverse=True)
+
+
+def build_nav_html(days: list[str], current_day: str, in_archive: bool) -> str:
+    """
+    生成导航条 HTML。
+
+    current_day : "" 表示当前是首页（最新）；否则是该归档的日期，会高亮对应按钮
+    in_archive  : True 时当前文件在 docs/archive/ 里，链接路径要用相对形式
+    """
+    if in_archive:
+        home_href = "../index.html"
+        arch_href = lambda d: f"{d}.html"            # noqa: E731
+    else:
+        home_href = "./"
+        arch_href = lambda d: f"archive/{d}.html"    # noqa: E731
+
+    parts = [NAV_CSS, '<nav class="anav">', '<span class="anav-t">历史归档</span>']
+    latest_cls = "anav-l latest active" if not current_day else "anav-l latest"
+    parts.append(f'<a class="{latest_cls}" href="{home_href}">最新</a>')
+
+    for d in days[:ARCHIVE_NAV_MAX]:
+        label = f"{d[:4]}-{d[4:6]}-{d[6:]}"
+        cls = "anav-l active" if d == current_day else "anav-l"
+        parts.append(f'<a class="{cls}" href="{arch_href(d)}">{label}</a>')
+
+    parts.append("</nav>")
+    return "".join(parts)
+
+
+def inject_nav(html: str, nav_html: str) -> str:
+    """
+    把导航条插到 <body ...> 之后。
+
+    用 sticky 定位而不是 fixed：sticky 会占据文档流空间，
+    不会盖住页面顶部原有的标题栏。
+    """
+    pos = html.find("<body")
+    if pos < 0:
+        return html
+    end = html.find(">", pos)
+    if end < 0:
+        return html
+    return html[:end + 1] + nav_html + html[end + 1:]
+
+
+def sync_archive_from_reports(with_banner: bool = True) -> int:
+    """
+    把 reports/ 里尚未归档的 dashboard_*.html 补进 docs/archive/。
+
+    为什么需要这一步：
+        模块一上线之前已经积累了好几天的报告，它们躺在 reports/ 里。
+        如果只归档「今天这一份」，导航条上就只有一天按钮，新功能等于没用。
+        这个函数负责把存量补齐，之后每天由 prepare_index 增量维护。
+
+    返回新增归档数量。
+    """
+    if not REPORTS_DIR.exists():
+        return 0
+    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+
+    # 先算出全量日期（已有归档 ∪ reports 里的报告），
+    # 这样每个新写出的归档页，导航条一次就是完整的。
+    report_days: list[str] = []
+    for p in REPORTS_DIR.glob("dashboard_*.html"):
+        d = extract_day(p)
+        if d and re.fullmatch(r"\d{8}", d):
+            report_days.append(d)
+
+    all_days = sorted(set(list_archive_days()) | set(report_days), reverse=True)
+
+    added = 0
+    for p in sorted(REPORTS_DIR.glob("dashboard_*.html")):
+        day = extract_day(p)
+        if not day or not re.fullmatch(r"\d{8}", day):
+            continue
+
+        target = ARCHIVE_DIR / ARCHIVE_NAME_FMT.format(day=day)
+        if target.exists():
+            continue
+
+        try:
+            html = p.read_text(encoding="utf-8")
+            if with_banner:
+                html = inject_banner(html, day, p.stat().st_mtime)
+            html = inject_nav(
+                html, build_nav_html(all_days, current_day=day, in_archive=True)
+            )
+            target.write_text(html, encoding="utf-8")
+            added += 1
+        except Exception as exc:
+            warn(f"归档 {p.name} 失败（跳过）：{exc}")
+
+    if added:
+        log(f"已把 {added} 天的历史报告补进 docs/archive/（共 {len(all_days)} 天）")
+    return added
+
+
 def prepare_index(src: Path, day: str, with_banner: bool) -> Tuple[bool, str]:
-    """把最新报告复制成 docs/index.html。返回 (是否有变更, 说明)。"""
+    """
+    把最新报告复制成 docs/index.html，同时存一份到 docs/archive/{day}.html。
+
+    返回 (是否有变更, 说明)。
+
+    两个页面唯一的内容差别是「历史归档」导航条里的高亮项：
+        index.html          -> 高亮「最新」
+        archive/{day}.html  -> 高亮对应日期
+    所以必须分别注入，不能简单复制同一份 HTML。
+    """
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
 
     try:
@@ -284,18 +436,47 @@ def prepare_index(src: Path, day: str, with_banner: bool) -> Tuple[bool, str]:
     if with_banner:
         html = inject_banner(html, day, src.stat().st_mtime)
 
-    # 内容没变就不重写文件，避免产生一个空的 commit
+    # ---------- 1) 归档 ----------
+    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+    days = list_archive_days()
+    if day not in days:
+        days = sorted(days + [day], reverse=True)
+
+    archive_file = ARCHIVE_DIR / ARCHIVE_NAME_FMT.format(day=day)
+    archive_html = inject_nav(
+        html, build_nav_html(days, current_day=day, in_archive=True)
+    )
+
+    archive_changed = True
+    if archive_file.exists():
+        try:
+            archive_changed = archive_file.read_text(encoding="utf-8") != archive_html
+        except Exception:
+            archive_changed = True
+
+    if archive_changed:
+        try:
+            archive_file.write_text(archive_html, encoding="utf-8")
+        except Exception as exc:
+            return False, f"写入 docs/archive/{day}.html 失败：{exc}"
+
+    # ---------- 2) 首页 ----------
+    index_html = inject_nav(
+        html, build_nav_html(days, current_day="", in_archive=False)
+    )
+
+    index_changed = True
     if INDEX_FILE.exists():
         try:
-            if INDEX_FILE.read_text(encoding="utf-8") == html:
-                return False, "docs/index.html 内容无变化（今天已经发布过）"
+            index_changed = INDEX_FILE.read_text(encoding="utf-8") != index_html
         except Exception:
-            pass
+            index_changed = True
 
-    try:
-        INDEX_FILE.write_text(html, encoding="utf-8")
-    except Exception as exc:
-        return False, f"写入 docs/index.html 失败：{exc}"
+    if index_changed:
+        try:
+            INDEX_FILE.write_text(index_html, encoding="utf-8")
+        except Exception as exc:
+            return False, f"写入 docs/index.html 失败：{exc}"
 
     # .nojekyll：告诉 GitHub Pages 别用 Jekyll 处理这个目录。
     # 不加也能用，但加了能避免 Jekyll 对特殊文件名的过滤。
@@ -305,7 +486,14 @@ def prepare_index(src: Path, day: str, with_banner: bool) -> Tuple[bool, str]:
     except Exception:
         pass
 
-    return True, f"已更新 docs/index.html（来源 {src.name}，{len(html) / 1024 / 1024:.2f} MB）"
+    if not index_changed and not archive_changed:
+        return False, "docs/index.html 与归档均无变化（今天已经发布过）"
+
+    size_mb = len(html) / 1024 / 1024
+    note = f"已更新 docs/index.html + docs/archive/{day}.html（共 {len(days)} 天归档，{size_mb:.2f} MB）"
+    if not index_changed:
+        note += "（仅归档变化）"
+    return True, note
 
 
 def push(day: str, dry_run: bool = False) -> int:
@@ -540,6 +728,10 @@ def run(dry_run: bool = False, with_banner: bool = True, quiet: bool = False) ->
         return 1
 
     warn_placeholder_email()
+
+    # 先补齐存量归档（reports/ 里还没进 docs/archive/ 的历史报告），
+    # 再处理当天这一份。顺序不能反：当天那份的导航要用到完整日期列表。
+    sync_archive_from_reports(with_banner)
 
     changed, msg = prepare_index(src, day, with_banner)
     log(msg)

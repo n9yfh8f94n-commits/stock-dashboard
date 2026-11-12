@@ -64,6 +64,8 @@ import pandas as pd
 import analyzer
 import config
 import lhb as lhb_mod
+import premium
+import sector_tracker
 from utils import clean_stock_df, logger, setup_logger
 
 try:
@@ -384,7 +386,15 @@ def _axis(name: str = "", split: bool = True, inverse: bool = False) -> opts.Axi
     )
 
 
-def _tooltip(trigger: str = "axis", formatter: Any = None) -> opts.TooltipOpts:
+def _tooltip(trigger: str = "axis", formatter: Any = None,
+             axis_pointer_type: str | None = None) -> opts.TooltipOpts:
+    """
+    统一 tooltip 样式。
+
+    axis_pointer_type : None 保持各图原有行为；
+                        "shadow" 适合堆叠柱（整列高亮）；
+                        "cross" 是十字准星，模块六统一开启。
+    """
     kw: Dict[str, Any] = dict(
         trigger=trigger,
         background_color="#1b2431",
@@ -395,6 +405,8 @@ def _tooltip(trigger: str = "axis", formatter: Any = None) -> opts.TooltipOpts:
     )
     if formatter is not None:
         kw["formatter"] = formatter
+    if axis_pointer_type:
+        kw["axis_pointer_type"] = axis_pointer_type
     return opts.TooltipOpts(**kw)
 
 
@@ -509,6 +521,9 @@ def chart_emotion(hist: pd.DataFrame) -> str:
                     "  return out;"
                     "}"
                 ),
+                # 十字准星：鼠标移动时同时出现横竖参考线，
+                # 方便把「涨停家数」和右轴的「炸板率」对齐读数
+                axis_pointer_type="cross",
             ),
             legend_opts=opts.LegendOpts(
                 pos_right="2%", pos_top=8,
@@ -681,6 +696,92 @@ def _parse_stock(cell: Any) -> Tuple[str, str]:
     if m:
         return m.group(1), m.group(2)
     return s.strip(), ""
+
+
+# ---------------------------------------------------------------- 图⑥ 题材生命周期
+# 固定调色板：题材数量有限（前 5 + 其他），颜色一旦定死用户就能记住谁是谁。
+# 不用 pyecharts 自动配色，因为它会随系列数量变化而错位。
+SECTOR_PALETTE = [
+    "#f6465d",  # 红
+    "#4c9aff",  # 蓝
+    "#f0b90b",  # 金
+    "#0ecb81",  # 绿
+    "#a371f7",  # 紫
+    "#ff9f43",  # 橙
+    "#2ea0c9",  # 青
+    "#e05f8a",  # 粉
+]
+
+
+def chart_sector_life(stack: Dict[str, Any]) -> str:
+    """
+    题材生命周期（堆叠柱状图）：横轴近 N 日，纵轴涨停家数，颜色=题材。
+
+    为什么主色题材按「近 N 天累计家数」选，而不是「最近一天的前 N 名」：
+        后者每天剧烈跳动，图例颜色天天变，读者记不住谁是谁，
+        根本看不出某个题材是在连续发酵还是在退潮。
+        累计排行稳定得多，颜色一旦定下来就基本不动。
+
+    为什么「其他」用暗灰：
+        它不代表某个具体题材，只是长尾合计。
+        给它上彩色会误导用户去找一支叫「其他」的行情。
+    """
+    if not stack or not stack.get("ok"):
+        return _empty_option((stack or {}).get("note") or "题材历史数据不足")
+
+    days = stack.get("days") or []
+    series = stack.get("series") or []
+    if not days or not series:
+        return _empty_option("题材历史数据不足")
+
+    x = [f"{str(d)[4:6]}-{str(d)[6:]}" for d in days]
+
+    bar = Bar(init_opts=opts.InitOpts(bg_color="transparent"))
+    bar.add_xaxis(x)
+
+    # 颜色按「原序列位置」固定下来，避免把「其他」挪到底部时颜色跟着错位
+    color_map: Dict[str, str] = {}
+    for i, s in enumerate(series):
+        nm = str(s.get("name") or "")
+        color_map[nm] = ("rgba(57,65,79,0.34)" if nm == "其他"
+                         else SECTOR_PALETTE[i % len(SECTOR_PALETTE)])
+
+    # 「其他」放最前 -> 堆叠时位于最底部，彩色题材浮在上方便于对比
+    ordered = sorted(series, key=lambda s: 0 if str(s.get("name")) == "其他" else 1)
+
+    for s in ordered:
+        name = str(s.get("name") or "")
+        is_other = name == "其他"
+
+        bar.add_yaxis(
+            name,
+            [int(v) for v in (s.get("data") or [])],
+            stack="sec",
+            bar_width="54%",
+            itemstyle_opts=opts.ItemStyleOpts(color=color_map.get(name, MUTED)),
+            label_opts=opts.LabelOpts(
+                is_show=not is_other,      # 「其他」不标数字，避免堆叠顶部数字拥挤
+                position="inside",
+                color="#0b0e14",
+                font_size=10,
+                font_weight="bold",
+            ),
+        )
+
+    bar.set_global_opts(
+        title_opts=_title("题材生命周期", stack.get("note", "")),
+        xaxis_opts=_axis(split=False),
+        yaxis_opts=_axis("涨停家数"),
+        legend_opts=opts.LegendOpts(
+            is_show=True, pos_top=6, pos_left="center", item_gap=14,
+            textstyle_opts=opts.TextStyleOpts(color=MUTED, font_size=11),
+        ),
+        tooltip_opts=_tooltip("axis", axis_pointer_type="cross"),
+    )
+    # 必须用 dump_options()：它返回纯 option JSON，供 c.setOption(...) 直接消费。
+    # 用 render_embed() 会返回一整份 <!DOCTYPE html> 文档，
+    # 塞进 setOption 里是语法错误，整个初始化脚本会静默失败、图表区一片空白。
+    return dump_options(bar)
 
 
 def chart_youzi_sankey(df: pd.DataFrame) -> str:
@@ -917,18 +1018,35 @@ def chart_youzi_heatmap(df: pd.DataFrame, top_stocks: int = 18) -> str:
                 max_=vmax,
                 range_color=[DOWN, "#1b2431", UP],
                 pos_right="1%",
-                pos_bottom="10%",
+                # 原来在 pos_bottom="10%"，会和下面新加的缩放滑块打架，
+                # 改挂到右上，给滑块让出底部空间
+                pos_top="26%",
                 item_width=11,
                 item_height=90,
                 is_calculable=True,
                 textstyle_opts=opts.TextStyleOpts(color=MUTED, font_size=10),
             ),
             legend_opts=opts.LegendOpts(is_show=False),
+            # 热力图横向是 18 只股票 + 纵向十几个游资，手机上格子会小到看不清。
+            # inside：滚轮/双指缩放；slider：底部可见的缩放条。
+            # 注意 pyecharts 的参数名是 range_start / range_end，
+            # 不是 start / end；而且默认值就是 20~80，
+            # 不显式改成 0~100 的话一打开只显示中间 60%，左右两边被裁掉。
+            datazoom_opts=[
+                opts.DataZoomOpts(type_="inside", xaxis_index=[0],
+                                  range_start=0, range_end=100),
+                opts.DataZoomOpts(
+                    type_="slider", xaxis_index=[0],
+                    range_start=0, range_end=100,
+                    pos_bottom="1%", pos_left="8%", pos_right="12%",
+                    height=16,
+                ),
+            ],
         )
     )
     # 旋转后的 X 轴标签由 containLabel 自动预留空间，
-    # 这里再把 bottom 收紧，避免矩阵被挤成细细一条、下方留一大片空白。
-    _with_grid(hm, top="19%", right="7%", bottom="9%", left="5%")
+    # 底部从 9% 放宽到 17%，给缩放滑块腾位置，否则矩阵会被挤扁。
+    _with_grid(hm, top="19%", right="7%", bottom="17%", left="5%")
     return dump_options(hm)
 
 
@@ -1042,14 +1160,126 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   .up{color:var(--up)} .down{color:var(--down)} .gold{color:var(--gold)}
   .blue{color:var(--blue)} .grey{color:var(--muted)}
 
+  /* ---------- 我的自选 ---------- */
+  .wl{margin-bottom:20px}
+  .wl-h{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;
+        margin-bottom:11px;color:var(--text)}
+  .wl-h .cnt{font-size:11.5px;font-weight:400;color:var(--muted)}
+  .wl-h .star{color:var(--gold)}
+  .wl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .wl-card{background:linear-gradient(165deg,var(--panel),var(--bg));
+           border:1px solid var(--border);border-left:3px solid var(--gold);
+           border-radius:12px;padding:13px 15px;
+           transition:transform .18s,border-color .18s}
+  .wl-card:hover{transform:translateY(-2px);border-color:#3b4d66}
+  .wl-card.empty{border-left-color:var(--muted);opacity:.75}
+  .wl-top{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+  .wl-name{font-size:16px;font-weight:700}
+  .wl-code{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .wl-pct{margin-left:auto;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+  .wl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .wl-tag{font-size:11px;padding:2px 8px;border-radius:5px;
+          border:1px solid var(--border);background:var(--panel2);color:var(--muted);
+          white-space:nowrap}
+  .wl-tag.lb{color:var(--up);border-color:rgba(246,70,93,.45)}
+  .wl-tag.lb-hi{color:#fff;background:var(--up);border-color:var(--up);font-weight:600}
+  .wl-tag.seal-s{color:#7ee7bb;border-color:rgba(14,203,129,.45)}
+  .wl-tag.seal-w{color:#f0c75b;border-color:rgba(240,185,11,.45)}
+  .wl-tag.lhb{color:var(--blue);border-color:rgba(76,154,255,.45)}
+  .wl-row{font-size:12px;color:var(--muted);margin-bottom:5px;
+          display:flex;gap:7px;line-height:1.55}
+  .wl-row .k{color:#5b6577;flex:0 0 34px}
+  .wl-row .v{color:var(--text);flex:1;word-break:break-all}
+  .wl-advice{margin-top:10px;padding:7px 10px;border-radius:8px;
+             background:rgba(240,185,11,.07);border:1px solid rgba(240,185,11,.2);
+             font-size:12px;color:#f0c75b;line-height:1.5}
+  .wl-advice.dim{background:rgba(91,101,119,.08);border-color:rgba(91,101,119,.25);
+                 color:var(--muted)}
+  @media(max-width:640px){.wl-grid{grid-template-columns:1fr}}
+
+  /* ---------- 次日溢价预期（模块三） ---------- */
+  .pm{margin-top:13px;border-top:1px solid var(--border);padding-top:12px}
+  .pm-h{font-size:13px;font-weight:600;margin-bottom:9px;
+        display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .pm-sub{font-size:11px;font-weight:400;color:var(--muted)}
+  .pm-t{width:100%;border-collapse:collapse;font-size:12px}
+  .pm-t th{font-size:11px;color:var(--muted);font-weight:500;text-align:right;
+           padding:4px 6px;border-bottom:1px solid var(--border);white-space:nowrap}
+  .pm-t th:first-child{text-align:left}
+  .pm-t td{padding:5px 6px;text-align:right;font-variant-numeric:tabular-nums;
+           border-bottom:1px solid rgba(36,48,64,.45)}
+  .pm-t td:first-child{text-align:left;color:var(--text)}
+  .pm-t tr:last-child td{border-bottom:none}
+  .pm-t tr.best td{background:rgba(240,185,11,.06)}
+  .pm-t tr.best td:first-child{color:var(--gold);font-weight:600}
+  .pm-t tr.na td{color:var(--muted)}
+  .pm-note{margin-top:9px;font-size:11.5px;color:#f0c75b;
+           background:rgba(240,185,11,.07);border:1px solid rgba(240,185,11,.2);
+           border-radius:7px;padding:7px 10px;line-height:1.5}
+  .pm-note.dim{color:var(--muted);background:rgba(91,101,119,.08);
+               border-color:rgba(91,101,119,.25)}
+  @media(max-width:640px){.pm-t th,.pm-t td{padding:4px 3px;font-size:11px}}
+
   /* ---------- 卡片 ---------- */
   .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
         padding:14px 16px 8px;margin-bottom:16px;
         box-shadow:0 2px 18px rgba(0,0,0,.22)}
   .chart{width:100%}
-  .h400{height:400px} .h340{height:340px} .h460{height:460px} .h430{height:430px}
+  .h240{height:240px} .h260{height:260px} .h400{height:400px} .h340{height:340px} .h460{height:460px} .h430{height:430px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:1080px){.grid2{grid-template-columns:1fr}}
+
+  /* ---------- 手机端（微信内打开）----------
+     430px 下原来的问题：header 是横向 flex，.spacer{flex:1} 把 badges 挤到右侧，
+     而 badges 拿到的是「剩余宽度」而不是整行宽度，于是 white-space:nowrap 的
+     badge 直接撑破视口，右侧内容被裁掉（截图里 +10.0% 缺了半个就是这原因）。
+     解法：小屏把 header 改成纵向排列，并去掉 spacer，让 badges 独占整行自然换行。 */
+  @media(max-width:760px){
+    /* 兜底：只要有一个元素横向超出，整页会按超宽布局，
+       表现为所有卡片右边被裁。先禁止横向滚动，再逐个收窄。 */
+    html,body{overflow-x:hidden;max-width:100%}
+    body{padding:14px 12px 30px;font-size:13px}
+    header{flex-direction:column;align-items:flex-start;gap:10px;padding-bottom:14px;margin-bottom:16px}
+    .spacer{display:none}
+    .badges{width:100%;gap:6px}
+    .badge{font-size:10.5px;padding:3px 8px}
+    .brand{font-size:19px}
+    .date{font-size:13px}
+    .date b{font-size:15px}
+
+    .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-bottom:15px}
+    .kpi{min-height:auto;padding:11px 12px;border-radius:11px}
+    .kpi .v{font-size:21px}
+    .kpi .s{-webkit-line-clamp:2}
+
+    .card{padding:10px 11px 6px;border-radius:11px;margin-bottom:12px}
+    .grid2{grid-template-columns:1fr;gap:11px}
+
+    /* grid / flex 子项默认 min-width:auto，会被最长的那个子内容撑开，
+       表现为卡片比视口还宽、右边被裁掉。强制归零才能真正收缩。 */
+    .wl-grid{grid-template-columns:1fr}
+    .wl-card,.kpi,.card,.wl-top,.wl-row{min-width:0}
+    .wl-pct{flex:0 0 auto;font-size:14px}
+    .wl-name{font-size:15px}
+    /* 涨跌幅独占一行右对齐：420px 级宽度下「名称+代码+涨幅」挤在一行，
+       margin-left:auto 会把涨幅顶到卡片外被裁掉 */
+    .wl-pct{flex-basis:100%;text-align:right;margin-left:0;margin-top:1px}
+
+    /* 图表降高度：手机上 400px 的图会占满一屏，滚起来很难受 */
+    .h400,.h340,.h430,.h460{height:300px}
+    .h260{height:210px}
+
+    /* 宽表格（游资席位明细 5 列、盯盘清单 6 列、次日溢价 5 列）在 430px 下必然超宽。
+       它们撑破 .card 之后整页会按超宽布局渲染，
+       导致所有卡片右边被裁——这就是自选卡涨幅显示不全的真正原因。
+       给每个可能超宽的容器加横向滚动，让内容自己滚，不影响外层。 */
+    .card{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .card > table,.pm,.pm-t{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .card > table{white-space:nowrap;font-size:11.5px;min-width:0}
+    .card > table th,.card > table td{padding:5px 7px}
+    .pm-t{display:block;white-space:nowrap}
+    .pm-t thead,.pm-t tbody{display:table;width:100%}
+  }
 
   /* ---------- 表格 ---------- */
   table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -1133,6 +1363,416 @@ def _clip(text: Any, limit: int) -> str:
     return t
 
 
+# ==============================================================================
+# 我的自选（模块二）
+# ==============================================================================
+WATCHLIST_JSON = BASE_DIR / "my_stocks.json"
+
+# 封单质量分档（单位：元）
+# 为什么用绝对值而不是「封单 / 流通市值」：
+#   东财涨停池的「流通市值」字段在部分个股上为空，比值会变成 NaN，
+#   反而制造数据缺口。而对打板来说绝对值已经够判：1 亿以上基本不会当天炸板，
+#   3000 万以下在弱市里开板概率明显偏高。
+SEAL_STRONG = 1.0e8
+SEAL_MEDIUM = 3.0e7
+
+
+def load_my_stocks() -> List[str]:
+    """
+    读取 my_stocks.json，返回 6 位股票代码列表。
+
+    同时兼容两种写法：
+        ["002578", "000525"]
+        {"stocks": ["002578", "000525"]}     # 可加 _readme 等说明字段，适合当模板
+
+    文件不存在 / 解析失败一律返回空列表，绝不抛异常：
+    自选看板是增值功能，不能因为它导致整个仪表盘生不出来。
+    """
+    if not WATCHLIST_JSON.exists():
+        return []
+
+    try:
+        raw = json.loads(WATCHLIST_JSON.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("my_stocks.json 解析失败（自选看板已跳过）：%s", exc)
+        return []
+
+    seq = raw.get("stocks") if isinstance(raw, dict) else raw
+    if not isinstance(seq, list):
+        logger.warning('my_stocks.json 格式不对：应为数组，或 {"stocks": [...]}')
+        return []
+
+    out: List[str] = []
+    for x in seq:
+        s = str(x).strip()
+        if re.fullmatch(r"\d{6}", s):
+            out.append(s)
+        elif s:
+            logger.warning("自选股代码格式不对，已跳过：%r（应为 6 位数字）", x)
+    return out
+
+
+def _seal_quality(seal_money: Any) -> Tuple[str, str, str]:
+    """封单质量 -> (等级, 颜色, 金额文本)。"""
+    try:
+        if seal_money is None or pd.isna(seal_money):
+            return "无封单", MUTED, ""
+        v = float(seal_money)
+    except (TypeError, ValueError):
+        return "无封单", MUTED, ""
+
+    if v >= SEAL_STRONG:
+        return "强封", DOWN, f"{v / 1e8:.2f}亿"
+    if v >= SEAL_MEDIUM:
+        return "中等", GOLD, f"{v / 1e4:.0f}万"
+    return "弱封", MUTED, f"{v / 1e4:.0f}万"
+
+
+def _sector_formation(zt: pd.DataFrame, sector: str) -> Tuple[int, str]:
+    """
+    题材阵型：同一题材今天有几家涨停 —— 就是超短线说的「有没有小弟」。
+
+    龙头带着 5 家以上补涨 = 主升阵型，资金认可、次日接力意愿强；
+    只有自己一家 = 独苗，一旦断板没有承接盘。
+    """
+    if not sector or zt is None or zt.empty or "所属行业" not in zt.columns:
+        return 0, "无题材信息"
+
+    n = int((zt["所属行业"].astype(str) == str(sector)).sum())
+    if n >= 5:
+        return n, f"主升阵型（{n} 家）"
+    if n >= 3:
+        return n, f"成型（{n} 家）"
+    if n == 2:
+        return n, "双人成行（2 家）"
+    return n, "独苗"
+
+
+def _youzi_for_stock(youzi_df: Optional[pd.DataFrame], code: str) -> List[Dict[str, Any]]:
+    """从游资表挑出涉及该股票的记录（操作股票字段形如「名称(代码)」）。"""
+    if youzi_df is None or youzi_df.empty or "操作股票" not in youzi_df.columns:
+        return []
+    try:
+        sub = youzi_df[
+            youzi_df["操作股票"].astype(str).str.contains(f"({code})", regex=False, na=False)
+        ]
+    except Exception:
+        return []
+    return sub.to_dict("records")
+
+
+def _advice(lianban: int, formation_n: int, youzi_net: float,
+            seal_level: str, in_zt: bool) -> Tuple[str, bool]:
+    """
+    生成「明日操作提示」。返回 (文案, 是否弱化显示)。
+
+    规则依据（超短线段位常识，不是玄学）：
+      · 高位板（>=5）最怕两件事 —— 没有补涨小弟、游资兑现离场。
+        两条同时成立时，次日高开往往就是出货窗口。
+      · 中位板（3-4）是分歧位，看的是「有没有资金愿意在这个位置接」。
+      · 二板看题材有没有形成阵型：阵型在，三板概率大；独苗二板多半见光死。
+      · 首板只看一件事：有没有游资进场。没有就是资金不认，等二板确认。
+      · 封单弱是不分位置的减分项，直接追加提示。
+    """
+    lb = int(lianban or 1)
+    net = float(youzi_net or 0.0)
+    has_youzi = abs(net) > 1.0
+
+    if not in_zt:
+        return "今日未涨停，不适用打板逻辑", True
+
+    if lb >= 5:
+        if formation_n <= 2:
+            base = "高位独苗，断板即走"
+        elif net < 0:
+            base = "游资撤离，谨防高开低走"
+        else:
+            base = "高位强势，破板减仓"
+    elif lb >= 3:
+        # 3-4 板也怕独苗：中位板断板往往比高位更突然，因为没有情绪惯性兜着
+        if formation_n <= 1:
+            base = "孤军深入，断板即走"
+        elif net > 0 and formation_n >= 3:
+            base = "有资金 + 有阵型，关注晋级"
+        elif net < 0:
+            base = "游资撤退，谨慎接力"
+        elif formation_n >= 3:
+            base = "阵型在，等竞价确认"
+        else:
+            base = "看竞价强度再定"
+    elif lb == 2:
+        if formation_n >= 3 and seal_level == "强封":
+            base = "强封 + 成阵，三板概率大"
+        elif formation_n >= 3:
+            base = "题材发酵中，看三板"
+        else:
+            base = "孤票二板，需板块配合"
+    else:
+        # 首板通常不上龙虎榜，游资记录为空 ≠ 没有资金，
+        # 所以这里先用封单强度判断，再看有没有游资进场。
+        if net > 0:
+            base = "游资进场，看次日承接"
+        elif seal_level == "强封" and formation_n >= 3:
+            base = "强封 + 阵型完整，看二板"
+        elif seal_level == "强封":
+            base = "封单够硬，看能否晋级"
+        elif has_youzi:
+            base = "游资净卖，谨慎"
+        else:
+            base = "无资金关注，等二板确认"
+
+    if seal_level == "弱封":
+        base += "｜封单偏弱"
+
+    return base, False
+
+
+def _name_from_cache(code: str, limit: int = 12) -> str:
+    """
+    从历史涨停池缓存里查股票名称（离线可用）。
+
+    为什么需要这一步：
+        自选股当天既没涨停、也没上龙虎榜时，涨停池和龙虎榜里都查不到名字，
+        页面上只能干巴巴显示「603366」这样的代码，体验很差。
+        而用户持有的票大概率前几天涨停过，扫一遍最近的缓存就能找到。
+    """
+    try:
+        files = sorted(CACHE_DIR.glob("*_zt_pool.csv"), reverse=True)[:limit]
+    except Exception:
+        return ""
+
+    for p in files:
+        try:
+            df = pd.read_csv(p, dtype={"代码": str}, usecols=["代码", "名称"])
+        except Exception:
+            continue
+        if df is None or df.empty:
+            continue
+        try:
+            hit = df[df["代码"].astype(str).str.zfill(6) == code]
+        except Exception:
+            continue
+        if not hit.empty:
+            nm = str(hit.iloc[0]["名称"] or "").strip()
+            if nm:
+                return nm
+    return ""
+
+
+def build_watchlist(day: str, data: Dict[str, Any],
+                    youzi_df: Optional[pd.DataFrame]) -> List[Dict[str, Any]]:
+    """
+    组装自选股看板数据，每只股票一条 dict。
+
+    数据来源：
+        data["zt"]      涨停池 -> 名称 / 涨跌幅 / 连板数 / 封板资金 / 题材
+        data["lhb"]     龙虎榜 -> 是否上榜
+        youzi_df        游资表 -> 游资名称 + 净买额
+        涨停池自身      -> 同题材涨停家数（阵型）
+    """
+    codes = load_my_stocks()
+    if not codes:
+        return []
+
+    zt = data.get("zt")
+    lhb = data.get("lhb")
+    zt = zt if isinstance(zt, pd.DataFrame) else pd.DataFrame()
+    lhb = lhb if isinstance(lhb, pd.DataFrame) else pd.DataFrame()
+
+    # 代码 -> 涨停池行
+    zt_idx: Dict[str, Any] = {}
+    if not zt.empty and "代码" in zt.columns:
+        for _, r in zt.iterrows():
+            zt_idx[str(r["代码"]).zfill(6)] = r
+
+    # 龙虎榜：代码集合 + 名称兜底（自选股没涨停时也能显示名字）
+    lhb_codes: set = set()
+    lhb_names: Dict[str, str] = {}
+    if not lhb.empty and "代码" in lhb.columns:
+        for _, r in lhb.iterrows():
+            c = str(r["代码"]).zfill(6)
+            lhb_codes.add(c)
+            nm = str(r.get("名称") or "").strip()
+            if nm:
+                lhb_names[c] = nm
+
+    items: List[Dict[str, Any]] = []
+    for code in codes:
+        row = zt_idx.get(code)
+
+        # ---- 今天没涨停：仍然展示，并说明为什么不适用 ----
+        if row is None:
+            fallback_name = lhb_names.get(code, "") or _name_from_cache(code)
+            items.append({
+                "代码": code,
+                "名称": fallback_name,
+                "在涨停池": False,
+                "涨跌幅": None,
+                "连板数": 0,
+                "封板资金": None,
+                "封单等级": "—",
+                "封单颜色": MUTED,
+                "封单文本": "",
+                "题材": "",
+                "阵型家数": 0,
+                "阵型": "",
+                "上龙虎榜": code in lhb_codes,
+                "游资": [],
+                "游资净额": 0.0,
+                "提示": "今日未涨停，不适用打板逻辑",
+                "弱化": True,
+            })
+            continue
+
+        # ---- 基础字段 ----
+        name = str(row.get("名称") or lhb_names.get(code, "")).strip()
+
+        try:
+            pct = float(row.get("涨跌幅"))
+        except (TypeError, ValueError):
+            pct = None
+
+        try:
+            lb = int(float(row.get("连板数") or 1))
+        except (TypeError, ValueError):
+            lb = 1
+
+        seal_money = row.get("封板资金")
+        sector = str(row.get("所属行业") or "").strip()
+
+        seal_level, seal_color, seal_text = _seal_quality(seal_money)
+        form_n, form_desc = _sector_formation(zt, sector)
+
+        yz = _youzi_for_stock(youzi_df, code)
+        yz_net = 0.0
+        for r in yz:
+            try:
+                yz_net += float(r.get("净买入(万)") or 0) * 1e4
+            except (TypeError, ValueError):
+                pass
+
+        tip, dim = _advice(lb, form_n, yz_net, seal_level, True)
+
+        try:
+            seal_val = float(seal_money) if seal_money is not None and not pd.isna(seal_money) else None
+        except (TypeError, ValueError):
+            seal_val = None
+
+        items.append({
+            "代码": code,
+            "名称": name,
+            "在涨停池": True,
+            "涨跌幅": pct,
+            "连板数": lb,
+            "封板资金": seal_val,
+            "封单等级": seal_level,
+            "封单颜色": seal_color,
+            "封单文本": seal_text,
+            "题材": sector,
+            "阵型家数": form_n,
+            "阵型": form_desc,
+            "上龙虎榜": code in lhb_codes or bool(yz),
+            "游资": yz,
+            "游资净额": yz_net,
+            "提示": tip,
+            "弱化": dim,
+        })
+
+    return items
+
+
+def render_watchlist(items: List[Dict[str, Any]]) -> str:
+    """
+    渲染「我的自选」区块。
+
+    没有配置自选股时返回空串，页面完全不留痕迹。
+    """
+    if not items:
+        return ""
+
+    from html import escape as _esc
+
+    cards: List[str] = []
+    for it in items:
+        in_zt = it["在涨停池"]
+        card_cls = "wl-card" if in_zt else "wl-card empty"
+
+        # 涨跌幅
+        if it["涨跌幅"] is None:
+            pct_html = '<span class="wl-pct grey">—</span>'
+        else:
+            pv = float(it["涨跌幅"])
+            pc = "up" if pv > 0 else ("down" if pv < 0 else "grey")
+            pct_html = f'<span class="wl-pct {pc}">{pv:+.2f}%</span>'
+
+        # 标签：连板 / 封单 / 龙虎榜
+        tags: List[str] = []
+        if in_zt:
+            lb = int(it["连板数"])
+            lb_cls = "wl-tag lb-hi" if lb >= 5 else "wl-tag lb"
+            tags.append(f'<span class="{lb_cls}">{lb}板</span>')
+
+            if it["封单等级"] not in ("无封单", "—"):
+                seal_cls = "wl-tag seal-s" if it["封单等级"] == "强封" else "wl-tag seal-w"
+                tags.append(
+                    f'<span class="{seal_cls}">{it["封单等级"]} {it["封单文本"]}</span>'
+                )
+
+        if it["上龙虎榜"]:
+            tags.append('<span class="wl-tag lhb">龙虎榜</span>')
+
+        tags_html = "".join(tags) if tags else '<span class="wl-tag">无标签</span>'
+
+        # 题材行
+        if in_zt and it["题材"]:
+            sector_txt = (f'{_esc(it["题材"])} · {_esc(it["阵型"])}'
+                          if it["阵型"] else _esc(it["题材"]))
+        else:
+            sector_txt = "—"
+
+        # 游资行
+        if it["游资"]:
+            parts: List[str] = []
+            for r in it["游资"][:3]:
+                nm = _esc(str(r.get("游资") or "").strip())
+                try:
+                    amt = float(r.get("净买入(万)") or 0)
+                except (TypeError, ValueError):
+                    amt = 0.0
+                sign = "买" if amt > 0 else ("卖" if amt < 0 else "平")
+                color = "up" if amt > 0 else ("down" if amt < 0 else "grey")
+                parts.append(f'<span class="{color}">{nm} {sign}{abs(amt):.0f}万</span>')
+            youzi_txt = "、".join(parts)
+            if len(it["游资"]) > 3:
+                youzi_txt += f' <span class="grey">等 {len(it["游资"])} 席</span>'
+        else:
+            youzi_txt = '<span class="grey">无游资记录</span>'
+
+        advice_cls = "wl-advice dim" if it["弱化"] else "wl-advice"
+
+        cards.append(f"""
+<div class="{card_cls}">
+  <div class="wl-top">
+    <span class="wl-name">{_esc(it["名称"]) if it["名称"] else "未命名"}</span>
+    <span class="wl-code">{it["代码"]}</span>
+    {pct_html}
+  </div>
+  <div class="wl-tags">{tags_html}</div>
+  <div class="wl-row"><span class="k">题材</span><span class="v">{sector_txt}</span></div>
+  <div class="wl-row"><span class="k">游资</span><span class="v">{youzi_txt}</span></div>
+  <div class="{advice_cls}">💡 {_esc(it["提示"])}</div>
+</div>""")
+
+    return f"""
+<section class="wl">
+  <div class="wl-h"><span class="star">&#9733;</span> 我的自选
+    <span class="cnt">{len(items)} 只 · 配置见 my_stocks.json</span>
+  </div>
+  <div class="wl-grid">{''.join(cards)}
+  </div>
+</section>"""
+
+
 def _kpi(label: str, value: str, sub: str = "", accent: str = BORDER, cls: str = "") -> str:
     sub_html = f'<div class="s">{sub}</div>' if sub else ""
     return (
@@ -1151,6 +1791,7 @@ def render_body(
     seat_note: str,
     health: Dict[str, Any],
     source_tag: str,
+    watch_items: Optional[List[Dict[str, Any]]] = None,
 ) -> str:
     """拼页面主体（不含 <script>）。图表初始化代码在 render_html 里统一拼。"""
     e = res["emotion"]
@@ -1186,6 +1827,12 @@ def render_body(
     <span class="badge">口径 <b>{source_tag}</b></span>
   </div>
 </header>"""
+
+    # ---------- 我的自选（模块二）----------
+    # 放在 KPI 之前：用户最关心的是自己持仓/盯盘的那几只，
+    # 先看它们的封单、阵型、游资，再往下看全市场概览。
+    # 没有配置自选股时 render_watchlist 返回空串，页面不留痕迹。
+    watch_html = render_watchlist(watch_items or [])
 
     # ---------- KPI ----------
     zb_rate = float(e.get("zb_rate", 0) or 0)
@@ -1225,8 +1872,13 @@ def render_body(
     charts_html = f"""
 <div class="card"><div id="c_emotion" class="chart h400"></div></div>
 
+<div class="card"><div id="c_sector_life" class="chart h340"></div></div>
+
 <div class="grid2">
-  <div class="card"><div id="c_ladder" class="chart h340"></div></div>
+  <div class="card">
+    <div id="c_ladder" class="chart h260"></div>
+    {_render_premium_table(res.get("premium"))}
+  </div>
   <div class="card">
     <h3 class="sec">主线板块</h3>
     {_render_sector_table(res)}
@@ -1258,7 +1910,9 @@ def render_body(
   <div>本页由程序自动生成，不构成任何投资建议。股市有风险，入市需谨慎。</div>
 </footer>"""
 
-    return header + warn_html + kpis + charts_html + footer
+    # 我的自选紧跟在页头之后、KPI 之前：
+    # 用户打开页面第一眼要看到的是自己关注的票，而不是全市场汇总。
+    return header + watch_html + warn_html + kpis + charts_html + footer
 
 
 def _render_sector_table(res: Dict[str, Any]) -> str:
@@ -1329,6 +1983,77 @@ def _render_youzi_table(df: pd.DataFrame, top: int = 14) -> str:
 </table>"""
 
 
+def _render_premium_table(stats: Dict[str, Any]) -> str:
+    """
+    渲染「次日溢价预期」表格（模块三），嵌在连板天梯图的卡片下方。
+
+    设计取舍：
+      · 数据不足时只显示一行灰底提示，不占版面、不抛异常
+      · 用「中位数」和「上涨概率」两列，而不只给均值——
+        涨停次日的收益分布右偏，均值容易被少数妖股拉高
+      · 盈亏比最优的那一档整行高亮，一眼能看到结论
+    """
+    from html import escape as _esc2
+
+    if not stats:
+        return ""
+
+    days_used = stats.get("days_used", 0)
+    total = stats.get("total_samples", 0)
+    sub = f"近 {days_used} 日 · {total} 样本 · 收盘口径"
+    head = f'<div class="pm-h">次日溢价预期<span class="pm-sub">{sub}</span></div>'
+
+    # ---- 数据不足：只给提示 ----
+    if not stats.get("ok"):
+        note = _esc2(str(stats.get("note") or "历史样本不足，暂无法统计。"))
+        return f'<div class="pm">{head}<div class="pm-note dim">{note}</div></div>'
+
+    best = stats.get("best") or ""
+    rows: List[str] = []
+
+    for g in stats.get("groups", []):
+        label = g.get("label", "?")
+        n = int(g.get("n") or 0)
+
+        if n == 0:
+            rows.append(
+                f'<tr class="na"><td>{label}</td><td>0</td>'
+                f'<td>—</td><td>—</td><td>—</td></tr>'
+            )
+            continue
+
+        avg = float(g.get("avg") or 0.0)
+        med = float(g.get("median") or 0.0)
+        win = float(g.get("win_rate") or 0.0)
+
+        avg_c = "up" if avg > 0 else ("down" if avg < 0 else "grey")
+        med_c = "up" if med > 0 else ("down" if med < 0 else "grey")
+        win_c = "up" if win >= 50 else "down"
+
+        # 样本不足的档打个星号，避免用户拿它当结论
+        flag = "" if g.get("enough") else '<span class="grey"> *</span>'
+        cls = ' class="best"' if label == best else ""
+
+        rows.append(
+            f'<tr{cls}><td>{label}{flag}</td><td>{n}</td>'
+            f'<td class="{avg_c}">{avg:+.2f}%</td>'
+            f'<td class="{med_c}">{med:+.2f}%</td>'
+            f'<td class="{win_c}">{win:.1f}%</td></tr>'
+        )
+
+    table = (
+        '<table class="pm-t">'
+        '<thead><tr><th>连板高度</th><th>样本</th><th>平均</th>'
+        '<th>中位数</th><th>上涨概率</th></tr></thead>'
+        f'<tbody>{"".join(rows)}</tbody></table>'
+    )
+
+    summary = premium.summarize(stats)
+    note_html = f'<div class="pm-note">&#128161; {_esc2(summary)}</div>' if summary else ""
+
+    return f'<div class="pm">{head}{table}{note_html}</div>'
+
+
 def _render_watch_table(res: Dict[str, Any]) -> str:
     """盯盘清单。"""
     w = res.get("watchlist", pd.DataFrame())
@@ -1367,12 +2092,14 @@ def render_html(
     seat_note: str,
     health: Dict[str, Any],
     source_tag: str,
+    watch_items: Optional[List[Dict[str, Any]]] = None,
 ) -> str:
     """组装完整 HTML（含内联 ECharts 与初始化脚本）。"""
-    body = render_body(day, res, hist, youzi_df, seat_note, health, source_tag)
+    body = render_body(day, res, hist, youzi_df, seat_note, health, source_tag, watch_items)
 
     chart_js = [
         ("c_emotion", chart_emotion(hist)),
+        ("c_sector_life", chart_sector_life(res.get("sector_stack"))),
         ("c_ladder", chart_ladder(res.get("zt", pd.DataFrame()))),
         ("c_sankey", chart_youzi_sankey(youzi_df)),
         ("c_heat", chart_youzi_heatmap(youzi_df)),
@@ -1437,6 +2164,35 @@ def run(day: str, days: int = DEFAULT_DAYS, use_seat: bool = True,
     # ① 当日分析（复用 analyzer，口径与 Markdown 报告完全一致）
     res = analyzer.analyze(data)
     res["zt"] = data["zt"]           # analyze 内部用的是清洗后的表，这里显式挂回去供画图用
+
+    # 模块三：次日溢价预期。读 cache 里的「昨日涨停池」快照，纯离线统计。
+    # 挂在 res 上而不是走函数参数，避免再改一遍 render 的签名。
+    res["premium"] = premium.build_premium_stats(30)
+    if res["premium"].get("ok"):
+        logger.info("次日溢价：%d 样本 / %d 日快照，盈亏比最优档 = %s",
+                    res["premium"].get("total_samples", 0),
+                    res["premium"].get("days_used", 0),
+                    res["premium"].get("best") or "—")
+    else:
+        logger.warning("次日溢价：样本不足，页面将显示提示（%s）",
+                       res["premium"].get("note", "")[:60])
+
+    # 模块四：题材生命周期。先幂等补齐历史，再取最近 10 天给堆叠图。
+    # 用 try 包住：题材统计出问题不能影响其他图表，页面必须还能出来。
+    try:
+        sector_tracker.update_history(60)
+        res["sector_stack"] = sector_tracker.build_stack_series(10)
+        _st = res["sector_stack"]
+        if _st.get("ok"):
+            logger.info("题材生命周期：%d 日 / %d 个系列（%s）",
+                        len(_st.get("days", [])), len(_st.get("series", [])),
+                        "、".join(s["name"] for s in _st.get("series", [])))
+        else:
+            logger.warning("题材生命周期：%s", str(_st.get("note", ""))[:60])
+    except Exception as exc:
+        logger.warning("题材生命周期统计失败（不影响其他图表）：%s", exc)
+        res["sector_stack"] = {"ok": False, "days": [], "series": [],
+                               "note": "题材统计失败，已跳过该图表"}
     e = res["emotion"]
     logger.info("情绪：%s ｜ 涨停 %s ｜ 炸板率 %.1f%% ｜ 赚钱效应 %+.2f%%",
                 e.get("status"), e.get("total_zt"), float(e.get("zb_rate", 0)),
@@ -1463,8 +2219,14 @@ def run(day: str, days: int = DEFAULT_DAYS, use_seat: bool = True,
 
     source_tag = "离线缓存" if not use_seat else "缓存+联网席位"
 
+    # ④.5 我的自选（模块二）：数据在渲染前算好，渲染层只负责拼 HTML
+    watch_items = build_watchlist(day, data, youzi_df)
+    if watch_items:
+        logger.info("自选看板：%d 只（%s）", len(watch_items),
+                    "、".join(i["代码"] for i in watch_items))
+
     # ⑤ 渲染
-    html = render_html(day, res, hist, youzi_df, seat_note, health, source_tag)
+    html = render_html(day, res, hist, youzi_df, seat_note, health, source_tag, watch_items)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     out = REPORT_DIR / f"dashboard_{day}.html"
     out.write_text(html, encoding="utf-8")
