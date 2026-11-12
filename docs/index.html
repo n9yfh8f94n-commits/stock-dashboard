@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>A股复盘仪表盘 20261111</title>
+<title>A股复盘仪表盘 20261112</title>
 <style>
   :root{
     --bg:#0b0e14; --panel:#131a24; --panel2:#1a2230; --border:#243040;
@@ -60,14 +60,126 @@
   .up{color:var(--up)} .down{color:var(--down)} .gold{color:var(--gold)}
   .blue{color:var(--blue)} .grey{color:var(--muted)}
 
+  /* ---------- 我的自选 ---------- */
+  .wl{margin-bottom:20px}
+  .wl-h{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;
+        margin-bottom:11px;color:var(--text)}
+  .wl-h .cnt{font-size:11.5px;font-weight:400;color:var(--muted)}
+  .wl-h .star{color:var(--gold)}
+  .wl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .wl-card{background:linear-gradient(165deg,var(--panel),var(--bg));
+           border:1px solid var(--border);border-left:3px solid var(--gold);
+           border-radius:12px;padding:13px 15px;
+           transition:transform .18s,border-color .18s}
+  .wl-card:hover{transform:translateY(-2px);border-color:#3b4d66}
+  .wl-card.empty{border-left-color:var(--muted);opacity:.75}
+  .wl-top{display:flex;align-items:baseline;gap:8px;margin-bottom:9px;flex-wrap:wrap}
+  .wl-name{font-size:16px;font-weight:700}
+  .wl-code{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .wl-pct{margin-left:auto;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+  .wl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .wl-tag{font-size:11px;padding:2px 8px;border-radius:5px;
+          border:1px solid var(--border);background:var(--panel2);color:var(--muted);
+          white-space:nowrap}
+  .wl-tag.lb{color:var(--up);border-color:rgba(246,70,93,.45)}
+  .wl-tag.lb-hi{color:#fff;background:var(--up);border-color:var(--up);font-weight:600}
+  .wl-tag.seal-s{color:#7ee7bb;border-color:rgba(14,203,129,.45)}
+  .wl-tag.seal-w{color:#f0c75b;border-color:rgba(240,185,11,.45)}
+  .wl-tag.lhb{color:var(--blue);border-color:rgba(76,154,255,.45)}
+  .wl-row{font-size:12px;color:var(--muted);margin-bottom:5px;
+          display:flex;gap:7px;line-height:1.55}
+  .wl-row .k{color:#5b6577;flex:0 0 34px}
+  .wl-row .v{color:var(--text);flex:1;word-break:break-all}
+  .wl-advice{margin-top:10px;padding:7px 10px;border-radius:8px;
+             background:rgba(240,185,11,.07);border:1px solid rgba(240,185,11,.2);
+             font-size:12px;color:#f0c75b;line-height:1.5}
+  .wl-advice.dim{background:rgba(91,101,119,.08);border-color:rgba(91,101,119,.25);
+                 color:var(--muted)}
+  @media(max-width:640px){.wl-grid{grid-template-columns:1fr}}
+
+  /* ---------- 次日溢价预期（模块三） ---------- */
+  .pm{margin-top:13px;border-top:1px solid var(--border);padding-top:12px}
+  .pm-h{font-size:13px;font-weight:600;margin-bottom:9px;
+        display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .pm-sub{font-size:11px;font-weight:400;color:var(--muted)}
+  .pm-t{width:100%;border-collapse:collapse;font-size:12px}
+  .pm-t th{font-size:11px;color:var(--muted);font-weight:500;text-align:right;
+           padding:4px 6px;border-bottom:1px solid var(--border);white-space:nowrap}
+  .pm-t th:first-child{text-align:left}
+  .pm-t td{padding:5px 6px;text-align:right;font-variant-numeric:tabular-nums;
+           border-bottom:1px solid rgba(36,48,64,.45)}
+  .pm-t td:first-child{text-align:left;color:var(--text)}
+  .pm-t tr:last-child td{border-bottom:none}
+  .pm-t tr.best td{background:rgba(240,185,11,.06)}
+  .pm-t tr.best td:first-child{color:var(--gold);font-weight:600}
+  .pm-t tr.na td{color:var(--muted)}
+  .pm-note{margin-top:9px;font-size:11.5px;color:#f0c75b;
+           background:rgba(240,185,11,.07);border:1px solid rgba(240,185,11,.2);
+           border-radius:7px;padding:7px 10px;line-height:1.5}
+  .pm-note.dim{color:var(--muted);background:rgba(91,101,119,.08);
+               border-color:rgba(91,101,119,.25)}
+  @media(max-width:640px){.pm-t th,.pm-t td{padding:4px 3px;font-size:11px}}
+
   /* ---------- 卡片 ---------- */
   .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
         padding:14px 16px 8px;margin-bottom:16px;
         box-shadow:0 2px 18px rgba(0,0,0,.22)}
   .chart{width:100%}
-  .h400{height:400px} .h340{height:340px} .h460{height:460px} .h430{height:430px}
+  .h240{height:240px} .h260{height:260px} .h400{height:400px} .h340{height:340px} .h460{height:460px} .h430{height:430px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:1080px){.grid2{grid-template-columns:1fr}}
+
+  /* ---------- 手机端（微信内打开）----------
+     430px 下原来的问题：header 是横向 flex，.spacer{flex:1} 把 badges 挤到右侧，
+     而 badges 拿到的是「剩余宽度」而不是整行宽度，于是 white-space:nowrap 的
+     badge 直接撑破视口，右侧内容被裁掉（截图里 +10.0% 缺了半个就是这原因）。
+     解法：小屏把 header 改成纵向排列，并去掉 spacer，让 badges 独占整行自然换行。 */
+  @media(max-width:760px){
+    /* 兜底：只要有一个元素横向超出，整页会按超宽布局，
+       表现为所有卡片右边被裁。先禁止横向滚动，再逐个收窄。 */
+    html,body{overflow-x:hidden;max-width:100%}
+    body{padding:14px 12px 30px;font-size:13px}
+    header{flex-direction:column;align-items:flex-start;gap:10px;padding-bottom:14px;margin-bottom:16px}
+    .spacer{display:none}
+    .badges{width:100%;gap:6px}
+    .badge{font-size:10.5px;padding:3px 8px}
+    .brand{font-size:19px}
+    .date{font-size:13px}
+    .date b{font-size:15px}
+
+    .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-bottom:15px}
+    .kpi{min-height:auto;padding:11px 12px;border-radius:11px}
+    .kpi .v{font-size:21px}
+    .kpi .s{-webkit-line-clamp:2}
+
+    .card{padding:10px 11px 6px;border-radius:11px;margin-bottom:12px}
+    .grid2{grid-template-columns:1fr;gap:11px}
+
+    /* grid / flex 子项默认 min-width:auto，会被最长的那个子内容撑开，
+       表现为卡片比视口还宽、右边被裁掉。强制归零才能真正收缩。 */
+    .wl-grid{grid-template-columns:1fr}
+    .wl-card,.kpi,.card,.wl-top,.wl-row{min-width:0}
+    .wl-pct{flex:0 0 auto;font-size:14px}
+    .wl-name{font-size:15px}
+    /* 涨跌幅独占一行右对齐：420px 级宽度下「名称+代码+涨幅」挤在一行，
+       margin-left:auto 会把涨幅顶到卡片外被裁掉 */
+    .wl-pct{flex-basis:100%;text-align:right;margin-left:0;margin-top:1px}
+
+    /* 图表降高度：手机上 400px 的图会占满一屏，滚起来很难受 */
+    .h400,.h340,.h430,.h460{height:300px}
+    .h260{height:210px}
+
+    /* 宽表格（游资席位明细 5 列、盯盘清单 6 列、次日溢价 5 列）在 430px 下必然超宽。
+       它们撑破 .card 之后整页会按超宽布局渲染，
+       导致所有卡片右边被裁——这就是自选卡涨幅显示不全的真正原因。
+       给每个可能超宽的容器加横向滚动，让内容自己滚，不影响外层。 */
+    .card{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .card > table,.pm,.pm-t{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .card > table{white-space:nowrap;font-size:11.5px;min-width:0}
+    .card > table th,.card > table td{padding:5px 7px}
+    .pm-t{display:block;white-space:nowrap}
+    .pm-t thead,.pm-t tbody{display:table;width:100%}
+  }
 
   /* ---------- 表格 ---------- */
   table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -99,60 +211,111 @@
            color:#e8d18a;margin-bottom:16px;line-height:1.75}
 </style>
 </head>
-<body><style>.anav{position:sticky;top:0;z-index:9998;display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(11,14,20,.96);border-bottom:1px solid #243040;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-x:auto;overflow-y:hidden;white-space:nowrap;font:12px/1.6 system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;-webkit-overflow-scrolling:touch}.anav-t{color:#5b6577;flex:0 0 auto;margin-right:2px;letter-spacing:.5px}.anav-l{flex:0 0 auto;display:inline-block;padding:3px 9px;border-radius:6px;color:#9aa7b8;text-decoration:none;border:1px solid #243040;background:#0f131a}.anav-l:hover{background:#18202b;color:#e6ebf2;border-color:#31404f}.anav-l.active{background:#1f6feb;border-color:#1f6feb;color:#fff;font-weight:600}.anav-l.latest{color:#3fb950;border-color:#1f4327}.anav-l.latest.active{color:#fff;background:#238636;border-color:#238636}@media(max-width:640px){.anav{padding:6px 8px;gap:4px}.anav-l{padding:3px 7px;font-size:11px}}</style><nav class="anav"><span class="anav-t">历史归档</span><a class="anav-l latest active" href="./">最新</a><a class="anav-l" href="archive/20261111.html">2026-11-11</a><a class="anav-l" href="archive/20261110.html">2026-11-10</a><a class="anav-l" href="archive/20261109.html">2026-11-09</a></nav>
+<body><style>.anav{position:sticky;top:0;z-index:9998;display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(11,14,20,.96);border-bottom:1px solid #243040;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-x:auto;overflow-y:hidden;white-space:nowrap;font:12px/1.6 system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;-webkit-overflow-scrolling:touch}.anav-t{color:#5b6577;flex:0 0 auto;margin-right:2px;letter-spacing:.5px}.anav-l{flex:0 0 auto;display:inline-block;padding:3px 9px;border-radius:6px;color:#9aa7b8;text-decoration:none;border:1px solid #243040;background:#0f131a}.anav-l:hover{background:#18202b;color:#e6ebf2;border-color:#31404f}.anav-l.active{background:#1f6feb;border-color:#1f6feb;color:#fff;font-weight:600}.anav-l.latest{color:#3fb950;border-color:#1f4327}.anav-l.latest.active{color:#fff;background:#238636;border-color:#238636}@media(max-width:640px){.anav{padding:6px 8px;gap:4px}.anav-l{padding:3px 7px;font-size:11px}}</style><nav class="anav"><span class="anav-t">历史归档</span><a class="anav-l latest active" href="./">最新</a><a class="anav-l" href="archive/20261112.html">2026-11-12</a><a class="anav-l" href="archive/20261111.html">2026-11-11</a><a class="anav-l" href="archive/20261110.html">2026-11-10</a><a class="anav-l" href="archive/20261109.html">2026-11-09</a></nav>
 <div class="wrap">
 
 <header>
   <div>
     <div class="brand">A股超短线 · <span class="accent">情绪仪表盘</span></div>
-    <div class="date" style="margin-top:5px">交易日 <b>2026-11-11</b>
-      　·　生成 2026-11-11 20:12</div>
+    <div class="date" style="margin-top:5px">交易日 <b>2026-11-12</b>
+      　·　生成 2026-11-12 15:44</div>
   </div>
   <div class="spacer"></div>
   <div class="badges">
-    <span class="badge" style="border-color:#4c9aff;color:#4c9aff">情绪 <b>🟡 回暖</b></span>
-    <span class="badge warn">数据源 <b>5/6</b></span><span class="badge">情绪周期窗口 <b>30</b> 日</span>
+    <span class="badge" style="border-color:#0ecb81;color:#0ecb81">情绪 <b>🟢 退潮</b></span>
+    <span class="badge warn">数据源 <b>4/6</b></span><span class="badge">情绪周期窗口 <b>30</b> 日</span>
     <span class="badge">口径 <b>缓存+联网席位</b></span>
   </div>
 </header>
+<section class="wl">
+  <div class="wl-h"><span class="star">&#9733;</span> 我的自选
+    <span class="cnt">4 只 · 配置见 my_stocks.json</span>
+  </div>
+  <div class="wl-grid">
+<div class="wl-card">
+  <div class="wl-top">
+    <span class="wl-name">日出东方</span>
+    <span class="wl-code">603366</span>
+    <span class="wl-pct up">+10.03%</span>
+  </div>
+  <div class="wl-tags"><span class="wl-tag lb-hi">5板</span><span class="wl-tag seal-w">中等 8270万</span></div>
+  <div class="wl-row"><span class="k">题材</span><span class="v">厨卫电器 · 独苗</span></div>
+  <div class="wl-row"><span class="k">游资</span><span class="v"><span class="grey">无游资记录</span></span></div>
+  <div class="wl-advice">💡 高位独苗，断板即走</div>
+</div>
+<div class="wl-card">
+  <div class="wl-top">
+    <span class="wl-name">亚玛顿</span>
+    <span class="wl-code">002623</span>
+    <span class="wl-pct up">+9.99%</span>
+  </div>
+  <div class="wl-tags"><span class="wl-tag lb">4板</span><span class="wl-tag seal-s">强封 1.70亿</span></div>
+  <div class="wl-row"><span class="k">题材</span><span class="v">光伏设备 · 双人成行（2 家）</span></div>
+  <div class="wl-row"><span class="k">游资</span><span class="v"><span class="grey">无游资记录</span></span></div>
+  <div class="wl-advice">💡 看竞价强度再定</div>
+</div>
+<div class="wl-card empty">
+  <div class="wl-top">
+    <span class="wl-name">东山精密</span>
+    <span class="wl-code">002384</span>
+    <span class="wl-pct grey">—</span>
+  </div>
+  <div class="wl-tags"><span class="wl-tag">无标签</span></div>
+  <div class="wl-row"><span class="k">题材</span><span class="v">—</span></div>
+  <div class="wl-row"><span class="k">游资</span><span class="v"><span class="grey">无游资记录</span></span></div>
+  <div class="wl-advice dim">💡 今日未涨停，不适用打板逻辑</div>
+</div>
+<div class="wl-card empty">
+  <div class="wl-top">
+    <span class="wl-name">未命名</span>
+    <span class="wl-code">000001</span>
+    <span class="wl-pct grey">—</span>
+  </div>
+  <div class="wl-tags"><span class="wl-tag">无标签</span></div>
+  <div class="wl-row"><span class="k">题材</span><span class="v">—</span></div>
+  <div class="wl-row"><span class="k">游资</span><span class="v"><span class="grey">无游资记录</span></span></div>
+  <div class="wl-advice dim">💡 今日未涨停，不适用打板逻辑</div>
+</div>
+  </div>
+</section><div class="warnbox"><div>🔴 亏钱效应：昨日涨停股今日平均 -0.92%，打板即亏，禁止接力任何高位股</div><div>⚠️ 炸板率 48.61% 超过 35%，封板质量极差，注意分歧转一致失败</div><div>💀 昨日涨停股中 5 只今日跌停（打板变接刀）</div></div>
 <div class="kpis">
-  <div class="kpi" style="--accent:#4c9aff"><div class="k">情绪档位</div><div class="v "><span style="color:#4c9aff">回暖</span></div><div class="s">炸板率 18.4% ≤ 30% 且赚钱效应 +2.92% > 0</div></div>
-  <div class="kpi" style="--accent:#f6465d"><div class="k">真实涨停 / 有效</div><div class="v ">84<small>/ 84</small></div><div class="s">剔除次新 0 家 · 跌停 0 家</div></div>
-  <div class="kpi" style="--accent:#0ecb81"><div class="k">炸板率</div><div class="v down">18.4<small>%</small></div><div class="s">封板率 <em>81.5%</em> · 炸板 19 家</div></div>
-  <div class="kpi" style="--accent:#f6465d"><div class="k">打板赚钱效应</div><div class="v up">+2.92<small>%</small></div><div class="s">上涨占比 <em>68.8%</em> · 晋级率 <em>21.5%</em></div></div>
-  <div class="kpi" style="--accent:#f0b90b"><div class="k">最高连板</div><div class="v gold">4<small>板</small></div><div class="s">大东方、日出东方</div></div>
-  <div class="kpi" style="--accent:#4c9aff"><div class="k">明日仓位建议</div><div class="v "><span style="font-size:15px">50%~70%</span></div><div class="s">可加仓主线龙头，止损位收紧到 -5%</div></div>
+  <div class="kpi" style="--accent:#0ecb81"><div class="k">情绪档位</div><div class="v "><span style="color:#0ecb81">退潮</span></div><div class="s">炸板率 48.6% ≥ 35% 且赚钱效应 -0.92% < 0</div></div>
+  <div class="kpi" style="--accent:#f6465d"><div class="k">真实涨停 / 有效</div><div class="v ">37<small>/ 37</small></div><div class="s">剔除次新 0 家 · 跌停 5 家</div></div>
+  <div class="kpi" style="--accent:#f6465d"><div class="k">炸板率</div><div class="v up">48.6<small>%</small></div><div class="s">封板率 <em>51.4%</em> · 炸板 35 家</div></div>
+  <div class="kpi" style="--accent:#0ecb81"><div class="k">打板赚钱效应</div><div class="v down">-0.92<small>%</small></div><div class="s">上涨占比 <em>36.9%</em> · 晋级率 <em>13.1%</em></div></div>
+  <div class="kpi" style="--accent:#f0b90b"><div class="k">最高连板</div><div class="v gold">5<small>板</small></div><div class="s">日出东方、大东方</div></div>
+  <div class="kpi" style="--accent:#4c9aff"><div class="k">明日仓位建议</div><div class="v "><span style="font-size:15px">10%~30%</span></div><div class="s">只做低位首板，严禁接力 3 板以上</div></div>
 </div>
 <div class="card"><div id="c_emotion" class="chart h400"></div></div>
 
+<div class="card"><div id="c_sector_life" class="chart h340"></div></div>
+
 <div class="grid2">
-  <div class="card"><div id="c_ladder" class="chart h340"></div></div>
+  <div class="card">
+    <div id="c_ladder" class="chart h260"></div>
+    <div class="pm"><div class="pm-h">次日溢价预期<span class="pm-sub">近 17 日 · 1112 样本 · 收盘口径</span></div><table class="pm-t"><thead><tr><th>连板高度</th><th>样本</th><th>平均</th><th>中位数</th><th>上涨概率</th></tr></thead><tbody><tr><td>1板</td><td>889</td><td class="up">+1.68%</td><td class="up">+1.39%</td><td class="up">58.4%</td></tr><tr><td>2板</td><td>147</td><td class="up">+0.99%</td><td class="down">-0.46%</td><td class="down">47.6%</td></tr><tr><td>3板</td><td>45</td><td class="up">+2.42%</td><td class="up">+4.98%</td><td class="up">55.6%</td></tr><tr class="best"><td>4板+</td><td>31</td><td class="up">+3.79%</td><td class="up">+6.47%</td><td class="up">71.0%</td></tr></tbody></table><div class="pm-note">&#128161; 4板+ 次日平均 +3.79%、上涨概率 71%，是当前盈亏比最好的一档</div></div>
+  </div>
   <div class="card">
     <h3 class="sec">主线板块</h3>
     
 <table>
   <thead><tr><th>板块</th><th style="text-align:right">涨停</th>
     <th style="text-align:right">占比</th><th style="text-align:right">最高</th><th>龙头</th></tr></thead>
-  <tbody><tr><td style='color:#8b98a8;font-weight:600'>汽车零部件</td><td style='text-align:right'>10</td><td style='text-align:right'>11.9%</td><td style='text-align:right'>3 板</td><td class='mono'>光洋股份(002708)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>通用设备</td><td style='text-align:right'>8</td><td style='text-align:right'>9.5%</td><td style='text-align:right'>3 板</td><td class='mono'>锋龙股份(002931)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>专用设备</td><td style='text-align:right'>7</td><td style='text-align:right'>8.3%</td><td style='text-align:right'>2 板</td><td class='mono'>达 意 隆(002209</td></tr><tr><td style='color:#8b98a8;font-weight:600'>通信设备</td><td style='text-align:right'>6</td><td style='text-align:right'>7.1%</td><td style='text-align:right'>2 板</td><td class='mono'>日海智能(002313)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>元件</td><td style='text-align:right'>5</td><td style='text-align:right'>6.0%</td><td style='text-align:right'>1 板</td><td class='mono'>东山精密(002384)</td></tr></tbody>
+  <tbody><tr><td style='color:#8b98a8;font-weight:600'>一般零售</td><td style='text-align:right'>3</td><td style='text-align:right'>8.1%</td><td style='text-align:right'>5 板</td><td class='mono'>大东方(600327)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>专用设备</td><td style='text-align:right'>3</td><td style='text-align:right'>8.1%</td><td style='text-align:right'>2 板</td><td class='mono'>中重科技(603135)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>光伏设备</td><td style='text-align:right'>2</td><td style='text-align:right'>5.4%</td><td style='text-align:right'>4 板</td><td class='mono'>亚玛顿(002623)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>燃气Ⅱ</td><td style='text-align:right'>2</td><td style='text-align:right'>5.4%</td><td style='text-align:right'>4 板</td><td class='mono'>东方环宇(603706)</td></tr><tr><td style='color:#8b98a8;font-weight:600'>基础建设</td><td style='text-align:right'>2</td><td style='text-align:right'>5.4%</td><td style='text-align:right'>1 板</td><td class='mono'>成都路桥(002628)</td></tr></tbody>
 </table>
 <div class="note">集中度 <b style="color:#0ecb81">低集中</b> —— 题材散乱轮动，无明确主线，只做首板且快进快出</div>
   </div>
 </div>
 
 <div class="card"><div id="c_sankey" class="chart h460"></div>
-  <div class="note">口径：双层：活跃营业部 + 20 只龙虎榜个股席位。桑基仅画净买入方向，净卖出见下方矩阵。</div>
+  <div class="note">口径：仅第一层（活跃营业部合计口径），单票金额不可得。桑基仅画净买入方向，净卖出见下方矩阵。</div>
 </div>
 
 <div class="card"><div id="c_heat" class="chart h430"></div></div>
 
 <div class="card">
   <h3 class="sec">游资席位明细</h3>
-  
-<table>
-  <thead><tr><th>游资</th><th>营业部</th><th style="text-align:right">净额(万)</th>
-    <th>操作股票</th><th>来源</th></tr></thead>
-  <tbody><tr><td><b>深南东路</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -13,526</td><td>冰山冷热(000530)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>温州帮</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +12,017</td><td>光迅科技(002281)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>方新侠</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +7,007</td><td>德尔股份(300473)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>T王</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +5,415</td><td>锋龙股份(002931)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>低位挖掘</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +5,373</td><td>果麦文化(301052)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>玉兰路</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -5,202</td><td>浙文影业(601599)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>温州帮</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +5,040</td><td>光洋股份(002708)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>温州帮</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +4,928</td><td>瑞迪智驱(301596)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>低位挖掘</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +4,694</td><td>上海电影(601595)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>杭州帮</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +4,440</td><td>福莱新材(605488)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>宁波桑田路</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -4,222</td><td>襄阳轴承(000678)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>温州帮</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +4,138</td><td>飞亚达(000026)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>玉兰路</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#f6465d;font-weight:600'>▲ +3,393</td><td>冰山冷热(000530)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr><tr><td><b>T王</b></td><td class='mono' title='同花顺游资榜'>同花顺游资榜</td><td style='text-align:right;color:#0ecb81;font-weight:600'>▼ -3,275</td><td>东方通信(600776)</td><td><span class='tag seat'>同花顺游资榜</span></td></tr></tbody>
-</table>
+  <div class="note">今日未命中知名游资席位，或龙虎榜数据缺失。</div>
   <div class="note">金额单位：万元。来源标注 <span class="tag seat">席位</span>
     为「该股票单票口径」，可跨游资横向比较。</div>
 </div>
@@ -163,7 +326,7 @@
 <table>
   <thead><tr><th>代码</th><th>名称</th><th style="text-align:right">连板</th>
     <th>行业</th><th style="text-align:right">封单</th><th>盯盘理由</th></tr></thead>
-  <tbody><tr><td class='mono'>603366</td><td><b>日出东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>4 板</td><td>厨卫电器</td><td style='text-align:right'>5.69 亿</td><td class='mono'>空间板4连·封单超3亿</td></tr><tr><td class='mono'>600327</td><td><b>大东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>4 板</td><td>一般零售</td><td style='text-align:right'>1.17 亿</td><td class='mono'>空间板4连</td></tr><tr><td class='mono'>002623</td><td><b>亚玛顿</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>光伏设备</td><td style='text-align:right'>1.72 亿</td><td class='mono'>3连板</td></tr><tr><td class='mono'>002931</td><td><b>锋龙股份</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>通用设备</td><td style='text-align:right'>1.47 亿</td><td class='mono'>3连板</td></tr><tr><td class='mono'>600715</td><td><b>文投控股</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>游戏Ⅱ</td><td style='text-align:right'>1.05 亿</td><td class='mono'>3连板</td></tr></tbody>
+  <tbody><tr><td class='mono'>603366</td><td><b>日出东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>5 板</td><td>厨卫电器</td><td style='text-align:right'>0.83 亿</td><td class='mono'>空间板5连</td></tr><tr><td class='mono'>600327</td><td><b>大东方</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>5 板</td><td>一般零售</td><td style='text-align:right'>0.27 亿</td><td class='mono'>空间板5连·相对最强方向</td></tr><tr><td class='mono'>002623</td><td><b>亚玛顿</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>4 板</td><td>光伏设备</td><td style='text-align:right'>1.70 亿</td><td class='mono'>4连板</td></tr><tr><td class='mono'>603706</td><td><b>东方环宇</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>4 板</td><td>燃气Ⅱ</td><td style='text-align:right'>0.40 亿</td><td class='mono'>4连板</td></tr><tr><td class='mono'>603536</td><td><b>惠发食品</b></td><td style='text-align:right;color:#f6465d;font-weight:600'>3 板</td><td>食品加工</td><td style='text-align:right'>0.49 亿</td><td class='mono'>3连板</td></tr></tbody>
 </table>
 </div>
 <footer>
@@ -243,18 +406,6 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
             "yAxisIndex": 0,
             "legendHoverLink": true,
             "data": [
-                {
-                    "value": 51,
-                    "itemStyle": {
-                        "color": "#f0b90b",
-                        "borderRadius": [
-                            3,
-                            3,
-                            0,
-                            0
-                        ]
-                    }
-                },
                 {
                     "value": 51,
                     "itemStyle": {
@@ -602,6 +753,18 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                             0
                         ]
                     }
+                },
+                {
+                    "value": 37,
+                    "itemStyle": {
+                        "color": "#0ecb81",
+                        "borderRadius": [
+                            3,
+                            3,
+                            0,
+                            0
+                        ]
+                    }
                 }
             ],
             "realtimeSort": false,
@@ -639,10 +802,6 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
             "step": false,
             "stackStrategy": "samesign",
             "data": [
-                [
-                    "09-23",
-                    33.77
-                ],
                 [
                     "09-24",
                     16.39
@@ -758,6 +917,10 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                 [
                     "11-11",
                     18.45
+                ],
+                [
+                    "11-12",
+                    48.61
                 ]
             ],
             "hoverAnimation": true,
@@ -873,7 +1036,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "trigger": "axis",
         "triggerOn": "mousemove|click",
         "axisPointer": {
-            "type": "line"
+            "type": "cross"
         },
         "showContent": true,
         "alwaysShowContent": false,
@@ -884,7 +1047,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "appendToBody": false,
         "transitionDuration": 0.4,
         "displayTransition": true,
-        "formatter": function(ps){  var i = ps[0].dataIndex;  var st = ["震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "回暖", "退潮", "高潮", "回暖", "震荡", "退潮", "退潮", "退潮", "高潮", "震荡", "震荡", "震荡", "震荡", "震荡", "高潮", "回暖"];  var mo = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, 3.56, -1.85, 3.38, 2.5, 1.36, 2.33, -0.65, -0.68, 2.83, 0.95, -0.32, 4.42, -0.15, 4.17, 5.0, 2.92];  var out = '<b>' + ps[0].axisValue + '</b>　' + st[i] + '<br/>';  for (var k = 0; k < ps.length; k++) {    var s = ps[k].seriesName;    var v = (s.indexOf('炸板率') >= 0) ? (ps[k].value + '%') : (ps[k].value + ' 家');    out += ps[k].marker + s + '：<b>' + v + '</b><br/>';  }  out += '赚钱效应：<b>' + (mo[i] >= 0 ? '+' : '') + mo[i] + '%</b>';  return out;},
+        "formatter": function(ps){  var i = ps[0].dataIndex;  var st = ["震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "震荡", "回暖", "退潮", "高潮", "回暖", "震荡", "退潮", "退潮", "退潮", "高潮", "震荡", "震荡", "震荡", "震荡", "震荡", "高潮", "回暖", "退潮"];  var mo = [null, null, null, null, null, null, null, null, null, null, null, null, null, 3.56, -1.85, 3.38, 2.5, 1.36, 2.33, -0.65, -0.68, 2.83, 0.95, -0.32, 4.42, -0.15, 4.17, 5.0, 2.92, -0.92];  var out = '<b>' + ps[0].axisValue + '</b>　' + st[i] + '<br/>';  for (var k = 0; k < ps.length; k++) {    var s = ps[k].seriesName;    var v = (s.indexOf('炸板率') >= 0) ? (ps[k].value + '%') : (ps[k].value + ' 家');    out += ps[k].marker + s + '：<b>' + v + '</b><br/>';  }  out += '赚钱效应：<b>' + (mo[i] >= 0 ? '+' : '') + mo[i] + '%</b>';  return out;},
         "textStyle": {
             "color": "#e6edf3",
             "fontSize": 12,
@@ -956,7 +1119,6 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
             "animationEasingUpdate": "cubicOut",
             "animationDelayUpdate": 0,
             "data": [
-                "09-23",
                 "09-24",
                 "09-28",
                 "09-29",
@@ -985,7 +1147,8 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                 "11-06",
                 "11-09",
                 "11-10",
-                "11-11"
+                "11-11",
+                "11-12"
             ]
         }
     ],
@@ -1148,6 +1311,526 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "containLabel": true
     }
 });charts.push(c);})();
+    (function(){var el = document.getElementById('c_sector_life');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({
+    "backgroundColor": "transparent",
+    "animation": true,
+    "animationThreshold": 2000,
+    "animationDuration": 1000,
+    "animationEasing": "cubicOut",
+    "animationDelay": 0,
+    "animationDurationUpdate": 300,
+    "animationEasingUpdate": "cubicOut",
+    "animationDelayUpdate": 0,
+    "aria": {
+        "enabled": false
+    },
+    "series": [
+        {
+            "type": "bar",
+            "name": "\u5176\u4ed6",
+            "legendHoverLink": true,
+            "data": [
+                25,
+                85,
+                23,
+                55,
+                31,
+                7,
+                17,
+                47,
+                32,
+                11
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stack": "sec",
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barWidth": "54%",
+            "barMinHeight": 0,
+            "barCategoryGap": "20%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": false,
+                "position": "inside",
+                "color": "#0b0e14",
+                "margin": 8,
+                "fontSize": 10,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": "rgba(57,65,79,0.34)"
+            }
+        },
+        {
+            "type": "bar",
+            "name": "\u6c7d\u8f66\u96f6\u90e8",
+            "legendHoverLink": true,
+            "data": [
+                0,
+                4,
+                0,
+                7,
+                2,
+                0,
+                5,
+                12,
+                10,
+                0
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stack": "sec",
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barWidth": "54%",
+            "barMinHeight": 0,
+            "barCategoryGap": "20%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": true,
+                "position": "inside",
+                "color": "#0b0e14",
+                "margin": 8,
+                "fontSize": 10,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": "#f6465d"
+            }
+        },
+        {
+            "type": "bar",
+            "name": "\u901a\u7528\u8bbe\u5907",
+            "legendHoverLink": true,
+            "data": [
+                2,
+                2,
+                0,
+                4,
+                2,
+                0,
+                5,
+                6,
+                8,
+                0
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stack": "sec",
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barWidth": "54%",
+            "barMinHeight": 0,
+            "barCategoryGap": "20%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": true,
+                "position": "inside",
+                "color": "#0b0e14",
+                "margin": 8,
+                "fontSize": 10,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": "#4c9aff"
+            }
+        },
+        {
+            "type": "bar",
+            "name": "\u5149\u4f0f\u8bbe\u5907",
+            "legendHoverLink": true,
+            "data": [
+                0,
+                2,
+                0,
+                3,
+                11,
+                3,
+                0,
+                3,
+                3,
+                2
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stack": "sec",
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barWidth": "54%",
+            "barMinHeight": 0,
+            "barCategoryGap": "20%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": true,
+                "position": "inside",
+                "color": "#0b0e14",
+                "margin": 8,
+                "fontSize": 10,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": "#f0b90b"
+            }
+        },
+        {
+            "type": "bar",
+            "name": "\u534a\u5bfc\u4f53",
+            "legendHoverLink": true,
+            "data": [
+                0,
+                0,
+                0,
+                19,
+                4,
+                0,
+                0,
+                2,
+                2,
+                0
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stack": "sec",
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barWidth": "54%",
+            "barMinHeight": 0,
+            "barCategoryGap": "20%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": true,
+                "position": "inside",
+                "color": "#0b0e14",
+                "margin": 8,
+                "fontSize": 10,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": "#0ecb81"
+            }
+        },
+        {
+            "type": "bar",
+            "name": "\u4e13\u7528\u8bbe\u5907",
+            "legendHoverLink": true,
+            "data": [
+                0,
+                2,
+                0,
+                6,
+                4,
+                0,
+                0,
+                4,
+                7,
+                3
+            ],
+            "realtimeSort": false,
+            "showBackground": false,
+            "stack": "sec",
+            "stackStrategy": "samesign",
+            "cursor": "pointer",
+            "barWidth": "54%",
+            "barMinHeight": 0,
+            "barCategoryGap": "20%",
+            "barGap": "30%",
+            "large": false,
+            "largeThreshold": 400,
+            "seriesLayoutBy": "column",
+            "datasetIndex": 0,
+            "clip": true,
+            "zlevel": 0,
+            "z": 2,
+            "label": {
+                "show": true,
+                "position": "inside",
+                "color": "#0b0e14",
+                "margin": 8,
+                "fontSize": 10,
+                "fontWeight": "bold",
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "itemStyle": {
+                "color": "#a371f7"
+            }
+        }
+    ],
+    "legend": [
+        {
+            "data": [
+                "\u5176\u4ed6",
+                "\u6c7d\u8f66\u96f6\u90e8",
+                "\u901a\u7528\u8bbe\u5907",
+                "\u5149\u4f0f\u8bbe\u5907",
+                "\u534a\u5bfc\u4f53",
+                "\u4e13\u7528\u8bbe\u5907"
+            ],
+            "selected": {},
+            "show": true,
+            "left": "center",
+            "top": 6,
+            "padding": 5,
+            "itemGap": 14,
+            "itemWidth": 25,
+            "itemHeight": 14,
+            "textStyle": {
+                "color": "#8b98a8",
+                "fontSize": 11,
+                "richInheritPlainLabel": true
+            },
+            "backgroundColor": "transparent",
+            "borderColor": "#ccc",
+            "borderRadius": 0,
+            "pageButtonItemGap": 5,
+            "pageButtonPosition": "end",
+            "pageFormatter": "{current}/{total}",
+            "pageIconColor": "#2f4554",
+            "pageIconInactiveColor": "#aaa",
+            "pageIconSize": 15,
+            "animationDurationUpdate": 800,
+            "selector": false,
+            "selectorPosition": "auto",
+            "selectorItemGap": 7,
+            "selectorButtonGap": 10,
+            "triggerEvent": false
+        }
+    ],
+    "tooltip": {
+        "show": true,
+        "trigger": "axis",
+        "triggerOn": "mousemove|click",
+        "axisPointer": {
+            "type": "cross"
+        },
+        "showContent": true,
+        "alwaysShowContent": false,
+        "showDelay": 0,
+        "hideDelay": 100,
+        "enterable": false,
+        "confine": false,
+        "appendToBody": false,
+        "transitionDuration": 0.4,
+        "displayTransition": true,
+        "textStyle": {
+            "color": "#e6edf3",
+            "fontSize": 12,
+            "richInheritPlainLabel": true
+        },
+        "backgroundColor": "#1b2431",
+        "borderColor": "#243040",
+        "borderWidth": 1,
+        "padding": 5,
+        "extraCssText": "box-shadow:0 8px 24px rgba(0,0,0,.5);border-radius:8px;",
+        "order": "seriesAsc"
+    },
+    "xAxis": [
+        {
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "nameTextStyle": {
+                "color": "#8b98a8",
+                "fontSize": 11,
+                "richInheritPlainLabel": true
+            },
+            "axisLine": {
+                "show": true,
+                "onZero": true,
+                "onZeroAxisIndex": 0,
+                "lineStyle": {
+                    "show": false,
+                    "color": "#243040"
+                }
+            },
+            "axisTick": {
+                "show": false,
+                "alignWithLabel": false,
+                "inside": false
+            },
+            "axisLabel": {
+                "show": true,
+                "color": "#8b98a8",
+                "margin": 8,
+                "fontSize": 11,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": false,
+                "lineStyle": {
+                    "show": false,
+                    "opacity": 0.45,
+                    "type": "dashed",
+                    "color": "#243040"
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0,
+            "data": [
+                "10-30",
+                "11-02",
+                "11-03",
+                "11-04",
+                "11-05",
+                "11-06",
+                "11-09",
+                "11-10",
+                "11-11",
+                "11-12"
+            ]
+        }
+    ],
+    "yAxis": [
+        {
+            "name": "\u6da8\u505c\u5bb6\u6570",
+            "show": true,
+            "scale": false,
+            "nameLocation": "end",
+            "nameGap": 15,
+            "nameTruncate": {},
+            "nameMoveOverlap": true,
+            "nameTextStyle": {
+                "color": "#8b98a8",
+                "fontSize": 11,
+                "richInheritPlainLabel": true
+            },
+            "axisLine": {
+                "show": true,
+                "onZero": true,
+                "onZeroAxisIndex": 0,
+                "lineStyle": {
+                    "show": false,
+                    "color": "#243040"
+                }
+            },
+            "axisTick": {
+                "show": false,
+                "alignWithLabel": false,
+                "inside": false
+            },
+            "axisLabel": {
+                "show": true,
+                "color": "#8b98a8",
+                "margin": 8,
+                "fontSize": 11,
+                "richInheritPlainLabel": true,
+                "valueAnimation": false
+            },
+            "inverse": false,
+            "offset": 0,
+            "splitNumber": 5,
+            "minInterval": 0,
+            "silent": false,
+            "triggerEvent": false,
+            "splitLine": {
+                "show": true,
+                "lineStyle": {
+                    "show": false,
+                    "opacity": 0.45,
+                    "type": "dashed",
+                    "color": "#243040"
+                }
+            },
+            "animation": true,
+            "animationThreshold": 2000,
+            "animationDuration": 1000,
+            "animationEasing": "cubicOut",
+            "animationDelay": 0,
+            "animationDurationUpdate": 300,
+            "animationEasingUpdate": "cubicOut",
+            "animationDelayUpdate": 0
+        }
+    ],
+    "title": [
+        {
+            "show": true,
+            "text": "\u9898\u6750\u751f\u547d\u5468\u671f",
+            "target": "blank",
+            "subtext": "\u8fd1 10 \u4e2a\u4ea4\u6613\u65e5 \u00b7 \u53e3\u5f84\uff1a\u4e1c\u8d22\u884c\u4e1a\uff08\u540c\u82b1\u987a\u9898\u6750\u7f3a\u5931\u65f6\u81ea\u52a8\u964d\u7ea7\uff09",
+            "subtarget": "blank",
+            "left": "1.2%",
+            "top": 8,
+            "padding": 5,
+            "itemGap": 7,
+            "textAlign": "auto",
+            "textVerticalAlign": "auto",
+            "triggerEvent": false,
+            "textStyle": {
+                "color": "#e6edf3",
+                "fontWeight": "bold",
+                "fontSize": 15,
+                "richInheritPlainLabel": true
+            },
+            "subtextStyle": {
+                "color": "#8b98a8",
+                "fontSize": 10.5,
+                "richInheritPlainLabel": true
+            }
+        }
+    ]
+});charts.push(c);})();
     (function(){var el = document.getElementById('c_ladder');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({
     "backgroundColor": "transparent",
     "animation": true,
@@ -1168,7 +1851,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
             "legendHoverLink": true,
             "data": [
                 {
-                    "value": 65,
+                    "value": 26,
                     "itemStyle": {
                         "color": "#3d7fd1",
                         "borderRadius": [
@@ -1180,7 +1863,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                     }
                 },
                 {
-                    "value": 12,
+                    "value": 5,
                     "itemStyle": {
                         "color": "#f08a5d",
                         "borderRadius": [
@@ -1192,9 +1875,9 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                     }
                 },
                 {
-                    "value": 5,
+                    "value": 2,
                     "itemStyle": {
-                        "color": "#f6465d",
+                        "color": "#3d7fd1",
                         "borderRadius": [
                             4,
                             4,
@@ -1216,9 +1899,9 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
                     }
                 },
                 {
-                    "value": 0,
+                    "value": 2,
                     "itemStyle": {
-                        "color": "#2b3648",
+                        "color": "#f6465d",
                         "borderRadius": [
                             4,
                             4,
@@ -1312,7 +1995,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "appendToBody": false,
         "transitionDuration": 0.4,
         "displayTransition": true,
-        "formatter": function(p){  var names = ["东山精密(002384)、剑桥科技(603083)、源杰科技(688498)、沪电股份(002463)、光迅科技(002281)、景旺电子(603228)、深南电路(002916)、英维克(002837)、金辰股份(603396)、长飞光纤(601869)、日发精机(002520)、奥士康(002913)、胜通能源(001331)、宁波东力(002164)、中坚科技(002779)、青山纸业(600103)、华盛昌(002980)、三联锻造(001282)、天洋新材(603330)、三峡新材(600293)、华脉科技(603042)、泽润新能(301636)、返利科技(600228)、利扬芯片(688135)、浙江世宝(002703)、顺发恒能(000631)、香江控股(600162)、致尚科技(301486)、星光股份(002076)、东易日盛(002713)、飞亚达(000026)、天安新材(603725)、赛福天(603028)、沃特股份(002886)、日上集团(002593)、科瑞技术(002957)、三钢闽光(002110)、报 喜 鸟(002154)、汉王科技(002362)、华建集团(600629)、北纬科技(002148)、凯盛新能(600876)、中重科技(603135)、神开股份(002278)、岱美股份(603730)、金浦钛业(000545)、东方通信(600776)、蓝黛科技(002765)、名臣健康(002919)、同飞股份(300990)、康欣新材(600076)、博杰股份(002975)、果麦文化(301052)、瑞迪智驱(301596)、新坐标(603040)、电魂网络(603258)、泰瑞机器(603289)、德尔股份(300473)、胜利股份(000407)、传智教育(003032)、海源复材(002529)、永和智控(002795)、申科股份(002633)、英 力 特(000635)、金麒麟(603586)", "达 意 隆(002209)、惠发食品(603536)、瀛通通讯(002861)、智微智能(001339)、凯撒文化(002425)、常铝股份(002160)、福莱新材(605488)、日海智能(002313)、风语筑(603466)、襄阳轴承(000678)、上海电影(601595)、天普股份(605255)", "亚玛顿(002623)、锋龙股份(002931)、文投控股(600715)、光洋股份(002708)、东方环宇(603706)", "日出东方(603366)、大东方(600327)", "该高度今日断档（0 家）", "该高度今日断档（0 家）"];  var famt = [54.02, 9.99, 5.36, 6.86, 0.0, 0.0];  var i = p.dataIndex;  if (p.value === 0) {    return '<b>' + p.name + '</b><br/><span style="color:#8b98a8">今日断档，无个股</span>';  }  return '<b>' + p.name + '</b>　' + p.value + ' 家<br/>' +         '封板资金合计：<b>' + famt[i] + ' 亿</b><br/>' +         '<span style="color:#8b98a8">' + names[i] + '</span>';},
+        "formatter": function(p){  var names = ["沈鼓集团(601091)、粤宏远Ａ(000573)、广百股份(002187)、成都路桥(002628)、起帆电缆(605222)、澳洋健康(002172)、吉视传媒(601929)、长城军工(601606)、宁波中百(600857)、好当家(600467)、龙江交通(601188)、洪通燃气(605169)、龙建股份(600853)、中捷资源(002021)、国统股份(002205)、兴欣新材(001358)、皇台酒业(000995)、九牧王(601566)、安阳钢铁(600569)、福建水泥(600802)、百洋股份(002696)、东方海洋(002086)、超颖电子(603175)、双成药业(002693)、哈森股份(603958)、大西洋(600558)", "金辰股份(603396)、北纬科技(002148)、天安新材(603725)、日上集团(002593)、中重科技(603135)", "惠发食品(603536)、天普股份(605255)", "亚玛顿(002623)、东方环宇(603706)", "日出东方(603366)、大东方(600327)", "该高度今日断档（0 家）"];  var famt = [8.97, 4.25, 0.56, 2.1, 1.1, 0.0];  var i = p.dataIndex;  if (p.value === 0) {    return '<b>' + p.name + '</b><br/><span style="color:#8b98a8">今日断档，无个股</span>';  }  return '<b>' + p.name + '</b>　' + p.value + ' 家<br/>' +         '封板资金合计：<b>' + famt[i] + ' 亿</b><br/>' +         '<span style="color:#8b98a8">' + names[i] + '</span>';},
         "textStyle": {
             "color": "#e6edf3",
             "fontSize": 12,
@@ -1489,798 +2172,8 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
         "containLabel": true
     }
 });charts.push(c);})();
-    (function(){var el = document.getElementById('c_sankey');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({
-    "backgroundColor": "transparent",
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "sankey",
-            "name": "\u51c0\u4e70\u5165\u6d41\u5411",
-            "data": [
-                {
-                    "name": "\u6e29\u5dde\u5e2e",
-                    "itemStyle": {
-                        "color": "#f6465d"
-                    }
-                },
-                {
-                    "name": "\u65b9\u65b0\u4fa0",
-                    "itemStyle": {
-                        "color": "#f6465d"
-                    }
-                },
-                {
-                    "name": "T\u738b",
-                    "itemStyle": {
-                        "color": "#f6465d"
-                    }
-                },
-                {
-                    "name": "\u4f4e\u4f4d\u6316\u6398",
-                    "itemStyle": {
-                        "color": "#f6465d"
-                    }
-                },
-                {
-                    "name": "\u676d\u5dde\u5e2e",
-                    "itemStyle": {
-                        "color": "#f6465d"
-                    }
-                },
-                {
-                    "name": "\u7389\u5170\u8def",
-                    "itemStyle": {
-                        "color": "#0ecb81"
-                    }
-                },
-                {
-                    "name": "\u5149\u8fc5\u79d1\u6280(002281)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u5fb7\u5c14\u80a1\u4efd(300473)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u950b\u9f99\u80a1\u4efd(002931)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u679c\u9ea6\u6587\u5316(301052)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u5149\u6d0b\u80a1\u4efd(002708)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u745e\u8fea\u667a\u9a71(301596)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u4e0a\u6d77\u7535\u5f71(601595)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u798f\u83b1\u65b0\u6750(605488)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u51b0\u5c71\u51b7\u70ed(000530)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u6c38\u81fb\u80a1\u4efd(603381)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u9f99\u6c5f\u4ea4\u901a(601188)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                },
-                {
-                    "name": "\u80af\u7279\u80a1\u4efd(301591)",
-                    "itemStyle": {
-                        "color": "#3d7fd1"
-                    }
-                }
-            ],
-            "links": [
-                {
-                    "source": "\u6e29\u5dde\u5e2e",
-                    "target": "\u5149\u8fc5\u79d1\u6280(002281)",
-                    "value": 12017.4,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u65b9\u65b0\u4fa0",
-                    "target": "\u5fb7\u5c14\u80a1\u4efd(300473)",
-                    "value": 7007.1,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "T\u738b",
-                    "target": "\u950b\u9f99\u80a1\u4efd(002931)",
-                    "value": 5415.3,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u4f4e\u4f4d\u6316\u6398",
-                    "target": "\u679c\u9ea6\u6587\u5316(301052)",
-                    "value": 5373.0,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u6e29\u5dde\u5e2e",
-                    "target": "\u5149\u6d0b\u80a1\u4efd(002708)",
-                    "value": 5040.2,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u6e29\u5dde\u5e2e",
-                    "target": "\u745e\u8fea\u667a\u9a71(301596)",
-                    "value": 4928.2,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u4f4e\u4f4d\u6316\u6398",
-                    "target": "\u4e0a\u6d77\u7535\u5f71(601595)",
-                    "value": 4694.0,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u676d\u5dde\u5e2e",
-                    "target": "\u798f\u83b1\u65b0\u6750(605488)",
-                    "value": 4439.6,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u7389\u5170\u8def",
-                    "target": "\u51b0\u5c71\u51b7\u70ed(000530)",
-                    "value": 3393.3,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "T\u738b",
-                    "target": "\u6c38\u81fb\u80a1\u4efd(603381)",
-                    "value": 3251.9,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "T\u738b",
-                    "target": "\u9f99\u6c5f\u4ea4\u901a(601188)",
-                    "value": 2506.8,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                },
-                {
-                    "source": "\u4f4e\u4f4d\u6316\u6398",
-                    "target": "\u80af\u7279\u80a1\u4efd(301591)",
-                    "value": 1921.0,
-                    "lineStyle": {
-                        "color": "gradient",
-                        "opacity": 0.28
-                    }
-                }
-            ],
-            "left": "6%",
-            "top": "20%",
-            "right": "24%",
-            "bottom": "7%",
-            "nodeWidth": 13,
-            "nodeGap": 15,
-            "nodeAlign": "justify",
-            "orient": "horizontal",
-            "draggable": true,
-            "zoom": 1,
-            "roam": false,
-            "label": {
-                "show": true,
-                "position": "right",
-                "color": "#e6edf3",
-                "margin": 8,
-                "fontSize": 10.5,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "lineStyle": {
-                "show": false,
-                "opacity": 0.28,
-                "curveness": 0.5,
-                "color": "gradient"
-            },
-            "itemStyle": {
-                "borderWidth": 0
-            }
-        }
-    ],
-    "legend": [
-        {
-            "data": [
-                "\u51c0\u4e70\u5165\u6d41\u5411"
-            ],
-            "selected": {},
-            "show": false,
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "item",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "formatter": function(p){  if (p.dataType === 'edge') {    return p.data.source + ' → ' + p.data.target + '<br/>净买入 <b>' + p.data.value + ' 万元</b>';  }  return '<b>' + p.name + '</b>';},
-        "textStyle": {
-            "color": "#e6edf3",
-            "fontSize": 12,
-            "richInheritPlainLabel": true
-        },
-        "backgroundColor": "#1b2431",
-        "borderColor": "#243040",
-        "borderWidth": 1,
-        "padding": 5,
-        "extraCssText": "box-shadow:0 8px 24px rgba(0,0,0,.5);border-radius:8px;",
-        "order": "seriesAsc"
-    },
-    "title": [
-        {
-            "show": true,
-            "text": "\u6e38\u8d44\u4e70\u5165\u6d41\u5411",
-            "target": "blank",
-            "subtext": "\u5de6=\u6e38\u8d44 \u00b7 \u53f3=\u4e2a\u80a1 \u00b7 \u7ebf\u5bbd=\u51c0\u4e70\u5165\u91d1\u989d\uff08\u4e07\u5143\uff09",
-            "subtarget": "blank",
-            "left": "1.2%",
-            "top": 8,
-            "padding": 5,
-            "itemGap": 7,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#e6edf3",
-                "fontWeight": "bold",
-                "fontSize": 15,
-                "richInheritPlainLabel": true
-            },
-            "subtextStyle": {
-                "color": "#8b98a8",
-                "fontSize": 10.5,
-                "richInheritPlainLabel": true
-            }
-        }
-    ]
-});charts.push(c);})();
-    (function(){var el = document.getElementById('c_heat');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({
-    "backgroundColor": "transparent",
-    "animation": true,
-    "animationThreshold": 2000,
-    "animationDuration": 1000,
-    "animationEasing": "cubicOut",
-    "animationDelay": 0,
-    "animationDurationUpdate": 300,
-    "animationEasingUpdate": "cubicOut",
-    "animationDelayUpdate": 0,
-    "aria": {
-        "enabled": false
-    },
-    "series": [
-        {
-            "type": "heatmap",
-            "name": "\u51c0\u4e70\u5165(\u4e07)",
-            "coordinateSystem": "cartesian2d",
-            "data": [
-                [
-                    1,
-                    0,
-                    12017.4
-                ],
-                [
-                    4,
-                    0,
-                    4138.3
-                ],
-                [
-                    5,
-                    0,
-                    4928.2
-                ],
-                [
-                    6,
-                    0,
-                    -2934.5
-                ],
-                [
-                    9,
-                    0,
-                    5040.2
-                ],
-                [
-                    16,
-                    0,
-                    3263.6
-                ],
-                [
-                    0,
-                    1,
-                    -13526.3
-                ],
-                [
-                    3,
-                    2,
-                    5373.0
-                ],
-                [
-                    10,
-                    2,
-                    4694.0
-                ],
-                [
-                    3,
-                    3,
-                    -846.4
-                ],
-                [
-                    4,
-                    3,
-                    1491.1
-                ],
-                [
-                    5,
-                    3,
-                    -573.3
-                ],
-                [
-                    6,
-                    3,
-                    2506.8
-                ],
-                [
-                    7,
-                    3,
-                    5415.3
-                ],
-                [
-                    13,
-                    3,
-                    507.6
-                ],
-                [
-                    14,
-                    3,
-                    486.7
-                ],
-                [
-                    15,
-                    3,
-                    -3275.4
-                ],
-                [
-                    17,
-                    3,
-                    3251.9
-                ],
-                [
-                    2,
-                    4,
-                    7007.1
-                ],
-                [
-                    12,
-                    5,
-                    -4221.7
-                ],
-                [
-                    13,
-                    5,
-                    -1500.9
-                ],
-                [
-                    13,
-                    6,
-                    -1603.2
-                ],
-                [
-                    14,
-                    6,
-                    -2891.1
-                ],
-                [
-                    11,
-                    7,
-                    4439.6
-                ],
-                [
-                    0,
-                    9,
-                    3393.3
-                ],
-                [
-                    8,
-                    9,
-                    -5202.4
-                ]
-            ],
-            "label": {
-                "show": true,
-                "color": "#e6edf3",
-                "margin": 8,
-                "fontSize": 10,
-                "formatter": function(p){  var v = p.value[2];  var a = Math.abs(v);  var s = a >= 10000 ? (a / 10000).toFixed(2) + '亿' : Math.round(a) + '万';  return (v > 0 ? '+' : '-') + s;},
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "selectedMode": false,
-            "zlevel": 0,
-            "z": 2
-        }
-    ],
-    "legend": [
-        {
-            "data": [
-                "\u51c0\u4e70\u5165(\u4e07)"
-            ],
-            "selected": {},
-            "show": false,
-            "padding": 5,
-            "itemGap": 10,
-            "itemWidth": 25,
-            "itemHeight": 14,
-            "backgroundColor": "transparent",
-            "borderColor": "#ccc",
-            "borderRadius": 0,
-            "pageButtonItemGap": 5,
-            "pageButtonPosition": "end",
-            "pageFormatter": "{current}/{total}",
-            "pageIconColor": "#2f4554",
-            "pageIconInactiveColor": "#aaa",
-            "pageIconSize": 15,
-            "animationDurationUpdate": 800,
-            "selector": false,
-            "selectorPosition": "auto",
-            "selectorItemGap": 7,
-            "selectorButtonGap": 10,
-            "triggerEvent": false
-        }
-    ],
-    "tooltip": {
-        "show": true,
-        "trigger": "item",
-        "triggerOn": "mousemove|click",
-        "axisPointer": {
-            "type": "line"
-        },
-        "showContent": true,
-        "alwaysShowContent": false,
-        "showDelay": 0,
-        "hideDelay": 100,
-        "enterable": false,
-        "confine": false,
-        "appendToBody": false,
-        "transitionDuration": 0.4,
-        "displayTransition": true,
-        "formatter": function(p){  var keys = ["冰山冷热(000530)", "光迅科技(002281)", "德尔股份(300473)", "果麦文化(301052)", "飞亚达(000026)", "瑞迪智驱(301596)", "龙江交通(601188)", "锋龙股份(002931)", "浙文影业(601599)", "光洋股份(002708)", "上海电影(601595)", "福莱新材(605488)", "襄阳轴承(000678)", "青岛食品(001219)", "桂林三金(002275)", "东方通信(600776)", "致尚科技(301486)", "永臻股份(603381)"];  var v = p.value[2];  var col = v > 0 ? '#f6465d' : '#0ecb81';  var a = Math.abs(v);  var amt = a >= 10000 ? (a / 10000).toFixed(2) + ' 亿元' : a.toFixed(0) + ' 万元';  return '<b>' + p.value[1] + '</b><br/>' + keys[p.value[0]] + '<br/>' +         '净额 <b style="color:' + col + '">' + (v > 0 ? '+' : '-') + amt + '</b>';},
-        "textStyle": {
-            "color": "#e6edf3",
-            "fontSize": 12,
-            "richInheritPlainLabel": true
-        },
-        "backgroundColor": "#1b2431",
-        "borderColor": "#243040",
-        "borderWidth": 1,
-        "padding": 5,
-        "extraCssText": "box-shadow:0 8px 24px rgba(0,0,0,.5);border-radius:8px;",
-        "order": "seriesAsc"
-    },
-    "xAxis": [
-        {
-            "type": "category",
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLine": {
-                "show": true,
-                "onZero": true,
-                "onZeroAxisIndex": 0,
-                "lineStyle": {
-                    "show": false,
-                    "color": "#243040"
-                }
-            },
-            "axisTick": {
-                "show": false,
-                "alignWithLabel": false,
-                "inside": false
-            },
-            "axisLabel": {
-                "show": true,
-                "color": "#8b98a8",
-                "rotate": 34,
-                "margin": 8,
-                "interval": 0,
-                "fontSize": 10,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": false,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "splitArea": {
-                "show": false,
-                "areaStyle": {
-                    "opacity": 0
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0,
-            "data": [
-                "\u51b0\u5c71\u51b7\u70ed",
-                "\u5149\u8fc5\u79d1\u6280",
-                "\u5fb7\u5c14\u80a1\u4efd",
-                "\u679c\u9ea6\u6587\u5316",
-                "\u98de\u4e9a\u8fbe",
-                "\u745e\u8fea\u667a\u9a71",
-                "\u9f99\u6c5f\u4ea4\u901a",
-                "\u950b\u9f99\u80a1\u4efd",
-                "\u6d59\u6587\u5f71\u4e1a",
-                "\u5149\u6d0b\u80a1\u4efd",
-                "\u4e0a\u6d77\u7535\u5f71",
-                "\u798f\u83b1\u65b0\u6750",
-                "\u8944\u9633\u8f74\u627f",
-                "\u9752\u5c9b\u98df\u54c1",
-                "\u6842\u6797\u4e09\u91d1",
-                "\u4e1c\u65b9\u901a\u4fe1",
-                "\u81f4\u5c1a\u79d1\u6280",
-                "\u6c38\u81fb\u80a1\u4efd"
-            ]
-        }
-    ],
-    "yAxis": [
-        {
-            "type": "category",
-            "show": true,
-            "scale": false,
-            "nameLocation": "end",
-            "nameGap": 15,
-            "nameTruncate": {},
-            "nameMoveOverlap": true,
-            "axisLine": {
-                "show": true,
-                "onZero": true,
-                "onZeroAxisIndex": 0,
-                "lineStyle": {
-                    "show": false,
-                    "color": "#243040"
-                }
-            },
-            "axisTick": {
-                "show": false,
-                "alignWithLabel": false,
-                "inside": false
-            },
-            "axisLabel": {
-                "show": true,
-                "color": "#8b98a8",
-                "margin": 8,
-                "fontSize": 11,
-                "richInheritPlainLabel": true,
-                "valueAnimation": false
-            },
-            "inverse": false,
-            "offset": 0,
-            "splitNumber": 5,
-            "minInterval": 0,
-            "silent": false,
-            "triggerEvent": false,
-            "splitLine": {
-                "show": false,
-                "lineStyle": {
-                    "show": false
-                }
-            },
-            "splitArea": {
-                "show": false,
-                "areaStyle": {
-                    "opacity": 0
-                }
-            },
-            "animation": true,
-            "animationThreshold": 2000,
-            "animationDuration": 1000,
-            "animationEasing": "cubicOut",
-            "animationDelay": 0,
-            "animationDurationUpdate": 300,
-            "animationEasingUpdate": "cubicOut",
-            "animationDelayUpdate": 0,
-            "data": [
-                "\u6e29\u5dde\u5e2e",
-                "\u6df1\u5357\u4e1c\u8def",
-                "\u4f4e\u4f4d\u6316\u6398",
-                "T\u738b",
-                "\u65b9\u65b0\u4fa0",
-                "\u5b81\u6ce2\u6851\u7530\u8def",
-                "\u601d\u660e\u5357\u8def",
-                "\u676d\u5dde\u5e2e",
-                "\u8457\u540d\u523a\u5ba2",
-                "\u7389\u5170\u8def",
-                "\u6210\u90fd\u7cfb"
-            ]
-        }
-    ],
-    "title": [
-        {
-            "show": true,
-            "text": "\u6e38\u8d44 \u00d7 \u4e2a\u80a1 \u4e70\u5356\u77e9\u9635",
-            "target": "blank",
-            "subtext": "\u7ea2=\u51c0\u4e70\u5165 \u00b7 \u7eff=\u51c0\u5356\u51fa \u00b7 \u7a7a\u767d=\u8be5\u5e2d\u4f4d\u672a\u53c2\u4e0e\u8be5\u80a1 \u00b7 \u60ac\u505c\u770b\u5168\u79f0",
-            "subtarget": "blank",
-            "left": "1.2%",
-            "top": 8,
-            "padding": 5,
-            "itemGap": 7,
-            "textAlign": "auto",
-            "textVerticalAlign": "auto",
-            "triggerEvent": false,
-            "textStyle": {
-                "color": "#e6edf3",
-                "fontWeight": "bold",
-                "fontSize": 15,
-                "richInheritPlainLabel": true
-            },
-            "subtextStyle": {
-                "color": "#8b98a8",
-                "fontSize": 10.5,
-                "richInheritPlainLabel": true
-            }
-        }
-    ],
-    "visualMap": {
-        "show": true,
-        "type": "continuous",
-        "min": -13526.3,
-        "max": 13526.3,
-        "textStyle": {
-            "color": "#8b98a8",
-            "fontSize": 10,
-            "richInheritPlainLabel": true
-        },
-        "inRange": {
-            "color": [
-                "#0ecb81",
-                "#1b2431",
-                "#f6465d"
-            ]
-        },
-        "calculable": true,
-        "inverse": false,
-        "splitNumber": 5,
-        "hoverLink": true,
-        "orient": "vertical",
-        "bottom": "10%",
-        "right": "1%",
-        "padding": 5,
-        "showLabel": true,
-        "itemWidth": 11,
-        "itemHeight": 90,
-        "borderWidth": 0
-    },
-    "grid": {
-        "top": "19%",
-        "left": "5%",
-        "right": "7%",
-        "bottom": "9%",
-        "containLabel": true
-    }
-});charts.push(c);})();
+    (function(){var el = document.getElementById('c_sankey');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({"backgroundColor": "transparent", "title": {"text": "无个股席位数据 —— 桑基图需要「游资×股票×金额」三元组\n请去掉 --no-seat 重新运行（会联网抓取龙虎榜个股买卖前五席位）", "left": "center", "top": "middle", "textStyle": {"color": "#8b98a8", "fontSize": 13, "fontWeight": "normal", "lineHeight": 22}}});charts.push(c);})();
+    (function(){var el = document.getElementById('c_heat');if(!el) return;var c = echarts.init(el, null, {renderer:'canvas'});c.setOption({"backgroundColor": "transparent", "title": {"text": "无个股席位数据 —— 热力图需要「游资×股票×金额」三元组\n请去掉 --no-seat 重新运行", "left": "center", "top": "middle", "textStyle": {"color": "#8b98a8", "fontSize": 13, "fontWeight": "normal", "lineHeight": 22}}});charts.push(c);})();
     window.addEventListener('resize', function(){
       charts.forEach(function(c){ try{ c.resize(); }catch(e){} });
     });
@@ -2291,6 +2184,6 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   } else { boot(); }
 })();
 </script>
-<div style="position:fixed;right:12px;bottom:12px;z-index:99999;background:rgba(19,26,36,.82);border:1px solid rgba(36,48,64,.9);color:#8b98a8;font:10.5px/1.55 system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;padding:3px 10px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;backdrop-filter:blur(3px);letter-spacing:.2px;">数据日期 2026-11-11 &nbsp;·&nbsp; 更新于 2026-11-11 20:12</div>
+<div style="position:fixed;right:12px;bottom:12px;z-index:99999;background:rgba(19,26,36,.82);border:1px solid rgba(36,48,64,.9);color:#8b98a8;font:10.5px/1.55 system-ui,-apple-system,'Segoe UI','PingFang SC',sans-serif;padding:3px 10px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;backdrop-filter:blur(3px);letter-spacing:.2px;">数据日期 2026-11-12 &nbsp;·&nbsp; 更新于 2026-11-12 15:44</div>
 </body>
 </html>
